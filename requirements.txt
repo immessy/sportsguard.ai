@@ -1,0 +1,27 @@
+# SportsGuard AI — Member 2 Dependencies
+# AI & Data Specialist: Video Fingerprinting, Gemini AI, Mock Data Simulation
+#
+# Python >= 3.10 required.
+# Install all: pip install -r requirements.txt
+
+# ── Gemini AI ───────────────────────────────────────────────────────────────
+google-genai>=1.0.0                 # Gemini SDK - current package (Module C)
+pydantic>=2.0.0                     # Strict JSON schema for Gemini responses
+
+# ── Computer Vision / Video Processing ──────────────────────────────────────
+opencv-python>=4.9.0                # Frame extraction from MP4/MOV (Module A)
+
+# ── Image Processing & Hashing ──────────────────────────────────────────────
+Pillow>=10.0.0                      # PIL Image — shared by all modules
+imagehash>=4.3.1                    # Perceptual hashing (Module A)
+
+# ── Numerical ───────────────────────────────────────────────────────────────
+numpy>=1.26.0                       # Frame array manipulation (optional, speeds up)
+
+# ── Standard lib (no install needed, listed for documentation) ───────────────
+# sqlite3   — fingerprint storage (built-in)
+# json      — JSON parsing (built-in)
+# time      — stream interval (built-in)
+# pathlib   — file path handling (built-in)
+# logging   — structured logging (built-in)
+# base64    — image encoding (built-in)
