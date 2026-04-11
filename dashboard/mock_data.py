@@ -2,128 +2,168 @@
 
 from __future__ import annotations
 
-# --- Dashboard home: live feed preview ---
+# --- Dashboard home: compact feed (match % + pill labels) ---
 DASHBOARD_FEED_ROWS: list[dict] = [
     {
-        "Source URL": "https://twitter.com/cricketbuzz/status/1782049912001234567",
-        "Match Confidence": "96.2%",
-        "Gemini Classification": "🔴 Piracy",
-        "Risk Score": 9,
-        "Detected At": "2026-04-11 09:12:08",
+        "platform": "twitter",
+        "display_url": "twitter.com/ipl_leaks_hd/status/1910234891",
+        "match_pct": 94,
+        "classification": "Piracy",
     },
     {
-        "Source URL": "https://t.me/ipl_highlights/8421",
-        "Match Confidence": "92.8%",
-        "Gemini Classification": "🔴 Piracy",
-        "Risk Score": 8,
-        "Detected At": "2026-04-11 09:09:51",
+        "platform": "telegram",
+        "display_url": "t.me/ipl_highlights_2026/887",
+        "match_pct": 87,
+        "classification": "Piracy",
     },
     {
-        "Source URL": "https://youtube.com/watch?v=Qx9wz2pL7kA",
-        "Match Confidence": "88.4%",
-        "Gemini Classification": "🟡 Transformative",
-        "Risk Score": 4,
-        "Detected At": "2026-04-11 09:03:10",
+        "platform": "youtube",
+        "display_url": "youtube.com/shorts/xK9mP2rLtZ",
+        "match_pct": 71,
+        "classification": "Transformative",
     },
     {
-        "Source URL": "https://twitter.com/MI_FanClub/status/1782049909009876543",
-        "Match Confidence": "85.7%",
-        "Gemini Classification": "🟢 Meme/Fan",
-        "Risk Score": 2,
-        "Detected At": "2026-04-11 08:57:44",
+        "platform": "twitter",
+        "display_url": "twitter.com/cricket_memes24/status/1910200112",
+        "match_pct": 45,
+        "classification": "Meme/Fan",
     },
 ]
 
-# --- Detection feed: baseline table (copied into session_state so we can append demos) ---
+# --- Detection feed (session_state seed) ---
 DETECTION_FEED_BASE_ROWS: list[dict] = [
     {
-        "Source URL": "https://twitter.com/CricketIndia/status/1782050012345678901",
-        "Match %": 96.8,
+        "platform": "twitter",
+        "display_url": "twitter.com/ipl_leaks_hd/status/1910234891",
+        "match_pct": 94,
         "Classification": "Piracy",
         "Risk Score": 10,
         "Detected At": "2026-04-11 09:18:32",
         "Action": "Take Down",
     },
     {
-        "Source URL": "https://t.me/ipl_fullmatch/1290",
-        "Match %": 94.1,
+        "platform": "telegram",
+        "display_url": "t.me/ipl_highlights_2026/887",
+        "match_pct": 87,
         "Classification": "Piracy",
         "Risk Score": 9,
         "Detected At": "2026-04-11 09:15:10",
         "Action": "Take Down",
     },
     {
-        "Source URL": "https://youtube.com/watch?v=Jk9LmN34OpQ",
-        "Match %": 89.5,
+        "platform": "youtube",
+        "display_url": "youtube.com/shorts/xK9mP2rLtZ",
+        "match_pct": 71,
         "Classification": "Transformative",
         "Risk Score": 6,
         "Detected At": "2026-04-11 09:09:02",
         "Action": "Review",
     },
     {
-        "Source URL": "https://twitter.com/RCB_Analysis/status/1782049987654321098",
-        "Match %": 86.3,
+        "platform": "youtube",
+        "display_url": "youtube.com/watch?v=Jk9LmN34OpQ",
+        "match_pct": 63,
         "Classification": "Transformative",
         "Risk Score": 5,
         "Detected At": "2026-04-11 09:04:19",
         "Action": "Review",
     },
     {
-        "Source URL": "https://youtube.com/shorts/Zx8pqR1TuVc",
-        "Match %": 83.9,
-        "Classification": "Meme",
+        "platform": "twitter",
+        "display_url": "twitter.com/cricket_memes24/status/1910200112",
+        "match_pct": 45,
+        "Classification": "Meme/Fan",
         "Risk Score": 3,
         "Detected At": "2026-04-11 08:58:47",
         "Action": "Ignore",
     },
     {
-        "Source URL": "https://twitter.com/MI_FanClub/status/1782049909009876543",
-        "Match %": 81.2,
-        "Classification": "Meme",
-        "Risk Score": 2,
+        "platform": "telegram",
+        "display_url": "t.me/cricketzone_unofficial/4421",
+        "match_pct": 89,
+        "Classification": "Piracy",
+        "Risk Score": 9,
         "Detected At": "2026-04-11 08:53:05",
-        "Action": "Ignore",
+        "Action": "Take Down",
     },
 ]
 
 SIMULATED_PIRACY_ROW: dict = {
-    "Source URL": "https://twitter.com/ipl_leak_mirror/status/1782051122334455667",
-    "Match %": 95.4,
+    "platform": "twitter",
+    "display_url": "twitter.com/ipl_leak_mirror/status/1910255001",
+    "match_pct": 95,
     "Classification": "Piracy",
     "Risk Score": 9,
     "Detected At": "2026-04-11 09:22:01",
     "Action": "Take Down",
 }
 
-# --- Propagation chart (mock viral spread) ---
-PROPAGATION_ROWS: list[dict] = [
-    {"Minutes since post": m, "Estimated reshares": int(12 + m * 18 + (m % 5) * 7)}
-    for m in range(0, 31, 2)
+# --- Hourly violation spread (mock chart) ---
+VIOLATION_SPREAD_HOURLY: list[dict] = [
+    {"time": "06:00", "count": 2},
+    {"time": "07:00", "count": 5},
+    {"time": "08:00", "count": 8},
+    {"time": "09:00", "count": 11},
+    {"time": "10:00", "count": 9},
+    {"time": "11:00", "count": 14},
+    {"time": "12:00", "count": 12},
+    {"time": "13:00", "count": 15},
+    {"time": "14:00", "count": 13},
 ]
 
-# --- DMCA report presets ---
+# Legacy name used by older chart code paths
+PROPAGATION_ROWS = VIOLATION_SPREAD_HOURLY
+
+# --- DMCA pending table ---
+PENDING_VIOLATIONS: list[dict] = [
+    {
+        "ref_id": "SG-2026-0847",
+        "display_url": "twitter.com/ipl_leaks_hd/status/1910234891",
+        "platform": "Twitter (X)",
+        "match_pct": 94,
+        "status": "Pending",
+    },
+    {
+        "ref_id": "SG-2026-0842",
+        "display_url": "t.me/ipl_highlights_2026/887",
+        "platform": "Telegram",
+        "match_pct": 87,
+        "status": "Pending",
+    },
+    {
+        "ref_id": "SG-2026-0838",
+        "display_url": "youtube.com/shorts/xK9mP2rLtZ",
+        "platform": "YouTube",
+        "match_pct": 71,
+        "status": "Pending",
+    },
+]
+
 DMCA_CASES: list[dict] = [
     {
         "label": "Twitter — full over replay (Piracy, risk 10)",
-        "infringing_url": "https://twitter.com/CricketIndia/status/1782050012345678901",
-        "original_title": "IPL 2026 — Match 42 Official Highlights (Rights: BCCI / Broadcaster)",
-        "match_pct": 96.8,
+        "ref_id": "SG-2026-0847",
+        "infringing_url": "https://twitter.com/ipl_leaks_hd/status/1910234891",
+        "original_title": "IPL 2026 — Official Broadcast Feed (BCCI / rights partner)",
+        "match_pct": 94.0,
         "classification": "Piracy",
         "risk_score": 10,
     },
     {
-        "label": "Telegram — match segment mirror (Piracy, risk 9)",
-        "infringing_url": "https://t.me/ipl_fullmatch/1290",
-        "original_title": "IPL 2026 — Match 42 Broadcast Feed (Rights: BCCI / Broadcaster)",
-        "match_pct": 94.1,
+        "label": "Telegram — segment mirror (Piracy, risk 9)",
+        "ref_id": "SG-2026-0842",
+        "infringing_url": "https://t.me/ipl_highlights_2026/887",
+        "original_title": "IPL 2026 — Official Broadcast Feed (BCCI / rights partner)",
+        "match_pct": 87.0,
         "classification": "Piracy",
         "risk_score": 9,
     },
     {
-        "label": "YouTube — tactical breakdown (Transformative, risk 6)",
-        "infringing_url": "https://youtube.com/watch?v=Jk9LmN34OpQ",
-        "original_title": "IPL 2026 — Match 42 Official Highlights (Rights: BCCI / Broadcaster)",
-        "match_pct": 89.5,
+        "label": "YouTube — clip (Transformative, risk 6)",
+        "ref_id": "SG-2026-0838",
+        "infringing_url": "https://youtube.com/shorts/xK9mP2rLtZ",
+        "original_title": "IPL 2026 — Official Highlights (BCCI / rights partner)",
+        "match_pct": 71.0,
         "classification": "Transformative",
         "risk_score": 6,
     },
@@ -131,29 +171,42 @@ DMCA_CASES: list[dict] = [
 
 
 def build_dmca_notice(case: dict) -> str:
+    ref = case.get("ref_id", "SG-2026-DEMO")
     return "\n".join(
         [
-            "DMCA TAKEDOWN NOTICE (DEMO / NOT LEGAL ADVICE)",
+            "DMCA TAKEDOWN NOTICE",
             "",
-            "Rights holder: SportsGuard AI Demo Rights Desk",
-            "Contact: rights-demo@sportsguard.ai",
+            f"Date: 2026-04-11",
+            f"Reference ID: {ref}",
             "",
-            "INFRINGING URL:",
-            case["infringing_url"],
+            "TO:",
+            "Designated Copyright Agent / Abuse Team",
+            "Hosting / Platform Provider (as applicable)",
             "",
-            "ORIGINAL WORK:",
+            "FROM:",
+            "Board of Control for Cricket in India (BCCI)",
+            "IPL Media Rights & Anti-Piracy Desk (demo sender)",
+            "Email: ipl-rights-demo@sportsguard.ai",
+            "",
+            "SUBJECT: Notice of copyright infringement under applicable policy",
+            "",
+            "DESCRIPTION OF COPYRIGHTED WORK:",
             case["original_title"],
             "",
-            "MATCH SIGNALS (DEMO):",
-            f"- Perceptual match: {case['match_pct']:.1f}%",
-            f"- Classification: {case['classification']}",
+            "LOCATION OF INFRINGING MATERIAL:",
+            case["infringing_url"],
+            "",
+            "TECHNICAL & CONTEXT SIGNALS (DEMO):",
+            f"- Perceptual match confidence: {case['match_pct']:.1f}%",
+            f"- Automated classification: {case['classification']}",
             f"- Risk score: {case['risk_score']}/10",
             "",
-            "REQUESTED ACTION:",
-            "Remove or disable access to the listed content expeditiously.",
+            "STATEMENT:",
+            "The use described above is not authorized by the rights holder. We request expeditious removal or disablement of access.",
             "",
-            "Good faith statement: This notice is submitted in good faith under applicable copyright policy.",
+            "GOOD FAITH / ACCURACY (DEMO TEXT):",
+            "This notice is provided in good faith. This export is for demonstration only and is not legal advice.",
             "",
-            "Signature: SportsGuard AI — Demo Export",
+            "Signature: IPL Media Rights — Demo Export (SportsGuard AI)",
         ]
     )

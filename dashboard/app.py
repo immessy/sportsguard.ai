@@ -1,166 +1,151 @@
 import streamlit as st
-from streamlit.errors import StreamlitAPIException
 
-# Correct Streamlit API: use page_title (not title). Icon shortcode avoids Windows emoji issues.
+# ── Must be first Streamlit call ─────────────────────────────────────────────
+st.set_page_config(
+    page_title="SportsGuard AI — Tactical Hub",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ── Imports after page config ─────────────────────────────────────────────────
+from branding import (
+    inject_global_css,
+    render_sidebar_logo,
+    render_sidebar_status,
+    COLORS,
+)
+import dashboard_page
+import upload_page
+import detection_page
+import dmca_page
+
+# ── Session state defaults ────────────────────────────────────────────────────
+def init_session_state():
+    defaults = {
+        "active_page":        "Dashboard",
+        "demo_mode":          True,
+        "backend_live":       False,
+        "upload_success":     False,
+        "upload_reg_id":      None,
+        "upload_response":    None,
+        "upload_title":       None,
+        "detections_list":    None,
+        "selected_violation": None,
+    }
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
+init_session_state()
+
+# ── Inject global CSS ─────────────────────────────────────────────────────────
+inject_global_css()
+
+# ── Sidebar ───────────────────────────────────────────────────────────────────
+with st.sidebar:
+    render_sidebar_logo()
+
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+    # Nav items with icons
+    NAV_ITEMS = {
+        "Dashboard":      "⊞  Dashboard",
+        "Upload":         "⬆  Upload",
+        "Detection Feed": "◎  Detection Feed",
+        "DMCA Reports":   "☰  DMCA Reports",
+    }
+
+    # Render nav using radio (hidden label, styled via CSS)
+    selected = st.radio(
+        "Navigation",
+        list(NAV_ITEMS.keys()),
+        format_func=lambda x: NAV_ITEMS[x],
+        key="nav_radio",
+        label_visibility="hidden",
+    )
+    st.session_state["active_page"] = selected
+
+    # Spacer
+    st.markdown(
+        f"<div style='flex:1;min-height:40px;'></div>",
+        unsafe_allow_html=True,
+    )
+
+    # Demo mode toggle
+    st.markdown(f"""
+    <div style="padding:8px 16px 0 16px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;
+                    text-transform:uppercase;color:{COLORS['text_muted']};
+                    margin-bottom:6px;">Mode</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    demo_mode = st.toggle(
+        "Demo Mode",
+        value=st.session_state["demo_mode"],
+        key="demo_toggle",
+        help="When ON: uses mock data. Safe for live presentations.",
+    )
+    st.session_state["demo_mode"] = demo_mode
+
+    # Backend status
+    render_sidebar_status(
+        backend_live=st.session_state["backend_live"],
+        demo_mode=demo_mode,
+    )
+
+    # Sentinel mode panel
+    sentinel_color = COLORS["accent"] if demo_mode else COLORS["success"]
+    st.markdown(f"""
+    <div style="
+        margin: 8px 12px 12px 12px;
+        background: rgba(245,158,11,0.06);
+        border: 1px solid rgba(245,158,11,0.2);
+        border-radius: 6px;
+        padding: 10px 12px;
+    ">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="width:6px;height:6px;background:{sentinel_color};
+                        border-radius:50%;animation:pulse-dot 1.5s infinite;"></div>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.1em;
+                         text-transform:uppercase;color:{COLORS['accent']};">
+                Sentinel Mode</span>
+        </div>
+        <div style="font-size:10px;color:{COLORS['text_muted']};line-height:1.5;">
+            {'Demo data active' if demo_mode else 'Live threat monitoring active'}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ── Route to pages ────────────────────────────────────────────────────────────
+page = st.session_state["active_page"]
+
 try:
-    st.set_page_config(
-        page_title="SportsGuard AI",
-        layout="wide",
-        page_icon=":shield:",
-        initial_sidebar_state="expanded",
-    )
-except StreamlitAPIException:
-    pass
-
-import time
-
-import pandas as pd
-import plotly.express as px
-
-from mock_data import (
-    DASHBOARD_FEED_ROWS,
-    DETECTION_FEED_BASE_ROWS,
-    DMCA_CASES,
-    PROPAGATION_ROWS,
-    SIMULATED_PIRACY_ROW,
-    build_dmca_notice,
-)
-
-st.sidebar.title("Navigation")
-page = st.sidebar.radio(
-    "Section",
-    options=["Dashboard", "Upload", "Detection Feed", "DMCA Reports"],
-    label_visibility="collapsed",
-)
-
-st.title("🛡️ SportsGuard AI — Rights Protection Dashboard")
-
-if page == "Dashboard":
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Videos Protected", 12, "+2 today")
-    c2.metric("Violations Caught", 47, "+8 today")
-    c3.metric("Avg Detection Time", "6.3s", "-0.4s")
-
-    st.subheader("Live Detection Feed")
-
-    df = pd.DataFrame(DASHBOARD_FEED_ROWS)
-    st.dataframe(df, use_container_width=True, hide_index=True)
-
-    st.subheader("Mock propagation — reshares over time (demo)")
-    prop_df = pd.DataFrame(PROPAGATION_ROWS)
-    fig = px.line(
-        prop_df,
-        x="Minutes since post",
-        y="Estimated reshares",
-        markers=True,
-        title="Estimated viral spread (mock)",
-    )
-    fig.update_layout(template="plotly_dark", margin=dict(l=20, r=20, t=50, b=20))
-    st.plotly_chart(fig, use_container_width=True)
-
-elif page == "Upload":
-    st.header("📤 Register Official Content")
-    st.info(
-        "Upload an official sports clip to fingerprint and protect it. The system will extract frames and generate perceptual hashes."
-    )
-
-    uploaded_file = st.file_uploader(
-        "Upload Official Video",
-        type=["mp4", "mov"],
-        accept_multiple_files=False,
-    )
-
-    if uploaded_file is not None:
-        st.video(uploaded_file)
-
-    title = st.text_input(
-        "Content Title",
-        placeholder="e.g. IPL Match 42 Highlights",
-    )
-
-    # TODO Phase 3: replace with api_client.upload_video()
-    if st.button("🔒 Fingerprint & Protect This Video", use_container_width=True):
-        with st.spinner("Extracting frames and generating fingerprints..."):
-            time.sleep(2)
-
-        final_title = title.strip() if title and title.strip() else "IPL Match 42 Highlights"
-        st.success("✅ Video registered! 143 frames fingerprinted and stored.")
-        st.json(
-            {
-                "video_id": 7,
-                "title": final_title,
-                "frames_processed": 143,
-                "status": "protected",
-            }
-        )
-
-elif page == "Detection Feed":
-    st.header("🔍 Live Detection Feed")
-
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Scanned Today", 1247)
-    m2.metric("Flagged", 23)
-    m3.metric("High Risk", 8)
-
-    risk_filter = st.selectbox(
-        "Filter by Risk Level",
-        ["All", "🔴 High Risk", "🟡 Medium Risk", "🟢 Low Risk"],
-        index=0,
-    )
-
-    # TODO Phase 3: replace mock_data with api_client.run_scan()
-    if "detection_rows" not in st.session_state:
-        st.session_state.detection_rows = [dict(r) for r in DETECTION_FEED_BASE_ROWS]
-
-    df_feed = pd.DataFrame(st.session_state.detection_rows)
-
-    if risk_filter == "🔴 High Risk":
-        df_feed = df_feed[df_feed["Risk Score"] >= 8]
-    elif risk_filter == "🟡 Medium Risk":
-        df_feed = df_feed[(df_feed["Risk Score"] >= 4) & (df_feed["Risk Score"] <= 7)]
-    elif risk_filter == "🟢 Low Risk":
-        df_feed = df_feed[df_feed["Risk Score"] < 4]
-
-    def highlight_risk(row):
-        if row["Risk Score"] >= 8:
-            return ["background-color: #fff0f0"] * len(row)
-        if 4 <= row["Risk Score"] <= 7:
-            return ["background-color: #fffbf0"] * len(row)
-        return ["background-color: #f0fff4"] * len(row)
-
-    styled = df_feed.style.apply(highlight_risk, axis=1)
-    st.dataframe(styled, use_container_width=True, hide_index=True)
-
-    b1, b2 = st.columns(2)
-    with b1:
-        if st.button("🔄 Refresh Scan", use_container_width=True):
-            st.toast("Scan triggered — checking 3 platforms...")
-    with b2:
-        if st.button("Simulate Detection", use_container_width=True):
-            st.session_state.detection_rows.insert(0, dict(SIMULATED_PIRACY_ROW))
-            st.toast("New detection added — Gemini: Piracy (demo).")
-
-elif page == "DMCA Reports":
-    st.header("📄 DMCA Reports")
-    st.caption("Select a mock violation — notice text fills in for download (demo only).")
-
-    # TODO Phase 3: wire selected row to real detection IDs from the API
-    case_idx = st.selectbox(
-        "Violation",
-        range(len(DMCA_CASES)),
-        format_func=lambda i: DMCA_CASES[i]["label"],
-        index=0,
-    )
-    case = DMCA_CASES[case_idx]
-
-    body = build_dmca_notice(case)
-    st.text_area("Notice draft", value=body, height=320)
-    st.download_button(
-        label="⬇️ Download notice (.txt)",
-        data=body.encode("utf-8"),
-        file_name="sportsguard_dmca_notice_demo.txt",
-        mime="text/plain",
-        use_container_width=True,
-    )
-
-st.caption("SportsGuard AI — Google Solution Challenge 2026")
+    if page == "Dashboard":
+        dashboard_page.render()
+    elif page == "Upload":
+        upload_page.render()
+    elif page == "Detection Feed":
+        detection_page.render()
+    elif page == "DMCA Reports":
+        dmca_page.render()
+except Exception as e:
+    # Demo-safe fallback — never show raw traceback
+    st.markdown(f"""
+    <div style="
+        background:rgba(239,68,68,0.08);
+        border:1px solid rgba(239,68,68,0.25);
+        border-left:3px solid #EF4444;
+        border-radius:6px;padding:20px;
+        font-family:'JetBrains Mono',monospace;font-size:12px;
+    ">
+        <div style="color:#FCA5A5;font-weight:700;margin-bottom:6px;">
+            ⚠ Runtime Error — Demo Mode Active
+        </div>
+        <div style="color:{COLORS['text_muted']}">{str(e)}</div>
+        <div style="color:{COLORS['text_muted']};margin-top:8px;font-size:11px;">
+            Switch to Demo Mode (sidebar toggle) to continue safely.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
