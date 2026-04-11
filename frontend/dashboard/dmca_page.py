@@ -117,7 +117,7 @@ def render_dmca_html(notice_text):
 
 def render():
     page_header(
-        "DMCA Report Generator",
+        "🔒 DMCA Report Generator",
         subtitle="",
         show_active=False,
     )
@@ -147,7 +147,7 @@ def render():
         st.markdown(f"""
         <div style="display:flex;justify-content:space-between;align-items:center;
                     margin-bottom:12px;">
-            <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;font-weight:700;
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
                         letter-spacing:.1em;text-transform:uppercase;
                         color:{COLORS['text_primary']};">
                 Pending Violations
@@ -205,10 +205,10 @@ def render():
         <div style="display:flex;justify-content:space-between;align-items:center;
                     margin-bottom:10px;">
             <div>
-                <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;
+                <div style="font-family:'Rajdhani',sans-serif;font-size:14px;
                             font-weight:700;letter-spacing:.1em;text-transform:uppercase;
                             color:{COLORS['text_primary']};">
-                    Formal DMCA Notice
+                    🔒 Formal DMCA Notice
                 </div>
                 <div style="font-size:10px;color:{COLORS['text_muted']};margin-top:2px;">
                     FORMAT: RFC-2022 ENHANCED
@@ -220,7 +220,7 @@ def render():
             border:1px solid {COLORS['border']};
             border-radius:8px;
             padding:20px;
-            font-family:'Courier Prime','Courier New',monospace;
+            font-family:'JetBrains Mono',monospace;
             font-size:11px;
             line-height:1.8;
             max-height:380px;
