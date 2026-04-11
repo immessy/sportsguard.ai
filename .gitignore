@@ -416,3 +416,22 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ── SportsGuard AI ──────────────────────────────────────────────────────────
+# SQLite databases (generated at runtime)
+*.db
+*.db-wal
+*.db-shm
+
+# Uploaded videos
+uploads/
+
+# Synthetic test videos (can be regenerated)
+test_data/synthetic_test.mp4
+test_data/videos/*.mp4
+
+# Compiled C++ extension
+*.so
+*.pyd
+build/
+*.egg-info/
