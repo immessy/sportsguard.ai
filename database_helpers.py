@@ -168,6 +168,7 @@ def insert_detection(
     classification: Optional[str] = None,
     risk_score: Optional[int] = None,
     reasoning: Optional[str] = None,
+    status: str = "pending",
     *,
     db_path: str = DEFAULT_DB_PATH,
 ) -> int:
@@ -175,9 +176,9 @@ def insert_detection(
     cur = execute_query(
         """INSERT INTO detections
                (video_id, source_url, platform, c_plus_plus_confidence,
-                gemini_classification, gemini_risk_score, gemini_reasoning)
-           VALUES (?, ?, ?, ?, ?, ?, ?);""",
-        (video_id, source_url, platform, confidence, classification, risk_score, reasoning),
+                gemini_classification, gemini_risk_score, gemini_reasoning, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?);""",
+        (video_id, source_url, platform, confidence, classification, risk_score, reasoning, status),
         db_path=db_path,
     )
     return cur.lastrowid
@@ -222,7 +223,7 @@ def get_dashboard_stats(*, db_path: str = DEFAULT_DB_PATH) -> Dict[str, Any]:
         "total_detections": total_detections,
         "detections_today": detections_today,
         "high_risk_count": high_risk,
-        "avg_detection_time": round(avg_confidence or 0, 2),
+        "avg_confidence": round(avg_confidence or 0, 2),  # avg match confidence %
     }
 
 

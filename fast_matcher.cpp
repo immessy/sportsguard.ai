@@ -54,18 +54,26 @@ MatchResult find_best_match(
     int    best_video_id = -1;
     size_t n             = db_hashes.size();
 
-    // Parallel reduction over the database hashes
-    #pragma omp parallel for schedule(static) shared(best_distance, best_video_id)
-    for (size_t i = 0; i < n; ++i) {
-        uint64_t db_hash  = db_hashes[i].first;
-        int      video_id = db_hashes[i].second;
-        int      dist     = popcount64(query_hash ^ db_hash);
+    // Thread-local reduction: each thread tracks its own best, merge once
+    #pragma omp parallel
+    {
+        int local_best_dist = std::numeric_limits<int>::max();
+        int local_best_vid  = -1;
+
+        #pragma omp for schedule(static) nowait
+        for (size_t i = 0; i < n; ++i) {
+            int dist = popcount64(query_hash ^ db_hashes[i].first);
+            if (dist < local_best_dist) {
+                local_best_dist = dist;
+                local_best_vid  = db_hashes[i].second;
+            }
+        }
 
         #pragma omp critical
         {
-            if (dist < best_distance) {
-                best_distance = dist;
-                best_video_id = video_id;
+            if (local_best_dist < best_distance) {
+                best_distance = local_best_dist;
+                best_video_id = local_best_vid;
             }
         }
     }

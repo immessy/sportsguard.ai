@@ -103,6 +103,22 @@ def _pil_to_base64(image: Image.Image, fmt: str = "JPEG") -> str:
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 
+# Public alias — used by verify_member2.py and other scripts
+pil_to_base64 = _pil_to_base64
+
+
+def _create_demo_frame(width: int = 320, height: int = 240) -> Image.Image:
+    """
+    Create a synthetic broadcast-style frame for testing/demo purposes.
+    Returns a PIL RGB Image resembling a cricket broadcast with a
+    green pitch background and a dark scoreboard bar.
+    """
+    arr = np.zeros((height, width, 3), dtype=np.uint8)
+    arr[:, :] = [34, 139, 34]      # green pitch
+    arr[0:30, :] = [10, 10, 10]    # broadcast scoreboard bar
+    return Image.fromarray(arr, mode="RGB")
+
+
 def _validate_response(data: Dict[str, Any]) -> Dict[str, Any]:
     """Sanity-check and coerce the response dict."""
     classification = data.get("classification", "Unknown")

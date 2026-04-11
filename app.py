@@ -182,33 +182,48 @@ def scan_feed():
 
         db_hashes = [(int(fp["phash"], 16), fp["video_id"]) for fp in all_fps]
 
-        # 3. Extract a single frame from the suspect video and hash it
+        # 3. Sample multiple frames from the suspect video and find best match
         try:
             import cv2
             import imagehash
             from PIL import Image as PILImage
 
             cap = cv2.VideoCapture(video_path)
-            ret, frame = cap.read()
-            cap.release()
+            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            sample_positions = [
+                max(0, total_frames // 4),
+                max(0, total_frames // 2),
+                max(0, 3 * total_frames // 4),
+            ]
 
-            if ret and frame is not None:
+            best_frame = None
+            best_match_result = {"video_id": -1, "confidence": 0.0, "hamming_distance": 65}
+
+            for pos in sample_positions:
+                cap.set(cv2.CAP_PROP_POS_FRAMES, pos)
+                ret, frame = cap.read()
+                if not ret or frame is None:
+                    continue
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 pil_img = PILImage.fromarray(gray)
                 query_hash = imagehash.phash(pil_img, hash_size=8)
                 query_hash_int = int(str(query_hash), 16)
-            else:
-                # If video can't be read, generate random hash for demo
-                import random
-                query_hash_int = random.getrandbits(64)
-                pil_img = PILImage.new("RGB", (320, 240))
+                candidate = _match_hash(query_hash_int, db_hashes, threshold=10)
+                if candidate["confidence"] > best_match_result["confidence"]:
+                    best_match_result = candidate
+                    best_frame = frame
+
+            cap.release()
+
+            match_result = best_match_result
+            pil_img = PILImage.fromarray(
+                cv2.cvtColor(best_frame, cv2.COLOR_BGR2RGB)
+            ) if best_frame is not None else PILImage.new("RGB", (320, 240))
         except Exception:
             import random
             query_hash_int = random.getrandbits(64)
+            match_result = _match_hash(query_hash_int, db_hashes, threshold=10)
             pil_img = None
-
-        # 4. Match against database using C++ engine (or fallback)
-        match_result = _match_hash(query_hash_int, db_hashes, threshold=10)
 
         elapsed = time.perf_counter() - t0
 
@@ -223,22 +238,33 @@ def scan_feed():
 
         # 5. If match confidence >= 85%, run Gemini classification
         classification_data = {"classification": "Unknown", "risk_score": 50, "reasoning": "Below confidence threshold"}
+        detection_status = "pending"
         if match_result["confidence"] >= 85.0 and pil_img is not None and GEMINI_API_KEY:
             classification_data = analyze_content(
                 pil_img,
                 metadata.get("text", ""),
                 api_key=GEMINI_API_KEY,
             )
+            detection_status = "classified"
 
-        # 6. Store detection
+        # 6. Resolve source URL from metadata (not tweet text)
+        source_url = (
+            metadata.get("source_url")
+            or metadata.get("url")
+            or metadata.get("link")
+            or f"https://twitter.com/user/status/{metadata.get('post_id', metadata.get('tweet_id', 'unknown'))}"
+        )
+
+        # 7. Store detection
         detection_id = insert_detection(
             video_id=match_result["video_id"],
-            source_url=metadata.get("text", ""),
+            source_url=source_url,
             platform=metadata.get("platform", "Unknown"),
             confidence=match_result["confidence"],
             classification=classification_data.get("classification"),
             risk_score=classification_data.get("risk_score"),
             reasoning=classification_data.get("reasoning"),
+            status=detection_status,
             db_path=DATABASE_PATH,
         )
 
@@ -250,7 +276,8 @@ def scan_feed():
             "confidence": round(match_result["confidence"], 2),
             "classification": classification_data.get("classification", "Unknown"),
             "risk_score": classification_data.get("risk_score", 50),
-            "source_url": metadata.get("text", ""),
+            "source_url": source_url,
+            "tweet_text": metadata.get("text", ""),
             "platform": metadata.get("platform", ""),
             "detected_at": datetime.now(timezone.utc).isoformat(),
             "detection_id": detection_id,

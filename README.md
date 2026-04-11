@@ -110,7 +110,8 @@ Pull next item from mock feed, match against database, classify.
   "confidence": 96.87,
   "classification": "Piracy",
   "risk_score": 92,
-  "source_url": "Full IPL match free download!",
+  "source_url": "https://twitter.com/user/status/tweet_90001",
+  "tweet_text": "Full IPL match free download!",
   "platform": "Twitter",
   "detected_at": "2026-04-08T14:30:00Z",
   "detection_id": 5,
@@ -130,7 +131,7 @@ Aggregate statistics for the dashboard.
   "total_detections": 47,
   "detections_today": 5,
   "high_risk_count": 12,
-  "avg_detection_time": 94.5
+  "avg_confidence": 94.5
 }
 ```
 

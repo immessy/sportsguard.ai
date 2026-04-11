@@ -25,7 +25,7 @@ DEFAULT_DB_PATH = "sportsguard.db"
 # Schema version — bump this whenever the schema changes so migrations can
 # detect drift between the expected and actual versions.
 # ---------------------------------------------------------------------------
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # ---------------------------------------------------------------------------
 # DDL statements
@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS detections (
     gemini_classification TEXT,
     gemini_risk_score     INTEGER,
     gemini_reasoning      TEXT,
+    status                TEXT    NOT NULL DEFAULT 'pending',
     detected_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (video_id) REFERENCES official_content(id) ON DELETE CASCADE
 );
@@ -158,8 +159,8 @@ def seed_data(conn: sqlite3.Connection) -> None:
     conn.execute(
         """INSERT INTO detections
                (video_id, source_url, platform, c_plus_plus_confidence,
-                gemini_classification, gemini_risk_score, gemini_reasoning, detected_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?);""",
+                gemini_classification, gemini_risk_score, gemini_reasoning, status, detected_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);""",
         (
             1,
             "https://twitter.com/pirate/status/99999",
@@ -168,6 +169,7 @@ def seed_data(conn: sqlite3.Connection) -> None:
             "Piracy",
             92,
             "Raw re-upload with no commentary or overlays.",
+            "classified",
             now,
         ),
     )

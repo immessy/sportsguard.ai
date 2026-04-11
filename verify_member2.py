@@ -15,28 +15,37 @@ print("    [OK] gemini_analyzer helpers work\n")
 
 # --- Test 2: fingerprint engine ---
 print("[2] Testing fingerprint_engine...")
-from fingerprint_engine import extract_fingerprints, save_fingerprints, load_fingerprints
-fps = extract_fingerprints("test_data/synthetic_test.mp4", fps_target=1)
-print(f"    Fingerprints extracted: {len(fps)}")
-for idx, h in fps:
-    print(f"    Frame {idx:5d}: {h}")
-saved = save_fingerprints("verify_test", fps)
-loaded = load_fingerprints("verify_test")
-assert len(loaded) == len(fps), "Mismatch in saved vs loaded fingerprints!"
-print(f"    Saved & reloaded: {len(loaded)} fingerprints")
+from fingerprint_engine import fingerprint_video
+from pathlib import Path
+import tempfile
+
+# Auto-generate a test video if needed
+test_video_path = "test_data/videos/official_clip.mp4"
+if not Path(test_video_path).exists():
+    print("    Generating test video...")
+    from generate_test_videos import generate_official
+    Path("test_data/videos").mkdir(parents=True, exist_ok=True)
+    generate_official()
+
+with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+    tmp_db = f.name
+
+from setup_database import init_database
+init_database(tmp_db)
+vid_id = fingerprint_video(test_video_path, "Verify Test", tmp_db)
+print(f"    Fingerprinted video_id: {vid_id}")
 print("    [OK] fingerprint_engine works\n")
 
 # --- Test 3: mock_scraper ---
 print("[3] Testing mock_scraper...")
-from mock_scraper import init_sample_data, stream_feed
-init_sample_data()
+from mock_scraper import simulate_feed
 events = []
-for event in stream_feed(interval=0, max_cycles=1):
-    events.append(event)
+for video_path, metadata in simulate_feed("test_data", min_delay=0, max_delay=0, loop=False):
+    events.append(metadata)
     if len(events) >= 3:
         break
 for e in events:
-    print(f"    {e['username']}: {e['tweet_text'][:50]}")
+    print(f"    @{e.get('user', '?')}: {e.get('text', '')[:50]}")
 print(f"    Total events in feed: {len(events)}")
 print("    [OK] mock_scraper works\n")
 
