@@ -2,7 +2,10 @@
   "post_id": "yt_44502",
   "platform": "YouTube",
   "user": "@TacticalBreakdown",
-  "text": "Bumrah's yorker sequence — why this over changed the game. Full tactical analysis with slow-mo breakdown 📊🏏",
+  "text": "Bumrah's yorker sequence \u2014 why this over changed the game. Full tactical analysis with slow-mo breakdown \ud83d\udcca\ud83c\udfd0",
   "timestamp": "2026-04-08T16:45:00Z",
-  "video_file": "suspect_video_002.mp4"
+  "video_file": "transformative_clip.mp4",
+  "scenario": "transformative",
+  "expected_classification": "Transformative",
+  "expected_risk_score_max": 50
 }
