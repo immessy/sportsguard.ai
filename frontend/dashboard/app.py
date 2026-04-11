@@ -1,14 +1,26 @@
+# dashboard/app.py
+# ─────────────────────────────────────────────────────────────────────────────
+# Main entry point for SportsGuard AI dashboard.
+# Handles sidebar nav, session state, and routing to page modules.
+#
+# Integration status (Prompt 8):
+#   - api_client.py is imported and used throughout
+#   - Demo Mode toggle controls whether real API or mock data is used
+#   - All API calls fall back silently to mock — UI never crashes
+# ─────────────────────────────────────────────────────────────────────────────
+
 import streamlit as st
 
-# ── Must be first Streamlit call ─────────────────────────────────────────────
+# ── Must be the very first Streamlit call ─────────────────────────────────────
 st.set_page_config(
-    page_title="SportsGuard AI — Rights ledger",
+    page_title="SportsGuard AI — Tactical Hub",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # ── Imports after page config ─────────────────────────────────────────────────
+import api_client
 from branding import (
     inject_global_css,
     render_sidebar_logo,
@@ -20,18 +32,23 @@ import upload_page
 import detection_page
 import dmca_page
 
-# ── Session state defaults ────────────────────────────────────────────────────
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SESSION STATE DEFAULTS
+# ─────────────────────────────────────────────────────────────────────────────
 def init_session_state():
     defaults = {
-        "active_page":        "Dashboard",
-        "demo_mode":          True,
-        "backend_live":       False,
-        "upload_success":     False,
-        "upload_reg_id":      None,
-        "upload_response":    None,
-        "upload_title":       None,
-        "detections_list":    None,
-        "selected_violation": None,
+        "active_page":         "Dashboard",
+        "demo_mode":           True,
+        "backend_live":        False,
+        "upload_success":      False,
+        "upload_reg_id":       None,
+        "upload_response":     None,
+        "upload_title":        None,
+        "detections_list":     None,
+        "selected_violation":  None,
+        "cached_stats":        None,
+        "cached_detections":   None,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -42,13 +59,48 @@ init_session_state()
 # ── Inject global CSS ─────────────────────────────────────────────────────────
 inject_global_css()
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BACKEND HEALTH CHECK
+# ─────────────────────────────────────────────────────────────────────────────
+def refresh_backend_status(demo_mode: bool):
+    if demo_mode:
+        st.session_state["backend_live"] = False
+        api_client.MOCK_MODE = True
+    else:
+        api_client.MOCK_MODE = False
+        is_live = api_client.check_backend_health()
+        st.session_state["backend_live"] = is_live
+        if not is_live:
+            api_client.MOCK_MODE = True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DATA LOADERS — passed to pages via session state
+# ─────────────────────────────────────────────────────────────────────────────
+def load_stats() -> dict:
+    return api_client.get_stats()
+
+def load_detections() -> dict:
+    return api_client.run_scan()
+
+def do_upload(file_bytes: bytes, filename: str, title: str) -> dict:
+    return api_client.upload_video(file_bytes, filename, title)
+
+st.session_state["load_stats"]        = load_stats
+st.session_state["load_detections"]   = load_detections
+st.session_state["do_upload"]         = do_upload
+st.session_state["get_sim_detection"] = api_client.get_simulated_detection
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SIDEBAR
+# ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
     render_sidebar_logo()
 
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
-    # Nav items with icons
     NAV_ITEMS = {
         "Dashboard":      "⊞  Dashboard",
         "Upload":         "⬆  Upload",
@@ -56,7 +108,6 @@ with st.sidebar:
         "DMCA Reports":   "☰  DMCA Reports",
     }
 
-    # Render nav using radio (hidden label, styled via CSS)
     selected = st.radio(
         "Navigation",
         list(NAV_ITEMS.keys()),
@@ -66,59 +117,94 @@ with st.sidebar:
     )
     st.session_state["active_page"] = selected
 
-    # Spacer
-    st.markdown(
-        f"<div style='flex:1;min-height:40px;'></div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
-    # Demo mode toggle
+    # ── Demo Mode toggle ──────────────────────────────────────────────────────
     st.markdown(f"""
-    <div style="padding:8px 16px 0 16px;">
+    <div style="padding: 0 16px 4px 16px;">
         <div style="font-size:9px;font-weight:700;letter-spacing:.1em;
                     text-transform:uppercase;color:{COLORS['text_muted']};
                     margin-bottom:6px;">Mode</div>
     </div>
     """, unsafe_allow_html=True)
 
+    prev_demo = st.session_state["demo_mode"]
     demo_mode = st.toggle(
         "Demo Mode",
         value=st.session_state["demo_mode"],
         key="demo_toggle",
-        help="When ON: uses mock data. Safe for live presentations.",
+        help="ON = mock data (safe for presentations). OFF = tries real Flask API.",
     )
-    st.session_state["demo_mode"] = demo_mode
 
-    # Backend status
+    if demo_mode != prev_demo:
+        st.session_state["demo_mode"]          = demo_mode
+        st.session_state["cached_stats"]       = None
+        st.session_state["cached_detections"]  = None
+        refresh_backend_status(demo_mode)
+        st.rerun()
+
+    if st.session_state["cached_stats"] is None:
+        refresh_backend_status(demo_mode)
+
+    # ── Backend status ────────────────────────────────────────────────────────
     render_sidebar_status(
         backend_live=st.session_state["backend_live"],
         demo_mode=demo_mode,
     )
 
-    # Sentinel mode panel
-    sentinel_color = COLORS["accent"] if demo_mode else COLORS["success"]
+    # ── Sentinel mode panel ───────────────────────────────────────────────────
+    is_live    = st.session_state["backend_live"]
+    dot_color  = COLORS["success"] if is_live else COLORS["accent"]
+    mode_text  = "Live threat monitoring active" if is_live else "Demo data active"
+    mode_label = "LIVE MODE"  if is_live else "DEMO MODE"
+    border_clr = "rgba(34,197,94,0.25)" if is_live else "rgba(245,158,11,0.2)"
+    bg_clr     = "rgba(34,197,94,0.05)" if is_live else "rgba(245,158,11,0.06)"
+
     st.markdown(f"""
     <div style="
         margin: 8px 12px 12px 12px;
-        background: rgba(143, 46, 46, 0.08);
-        border: 1px solid rgba(143, 46, 46, 0.22);
+        background: {bg_clr};
+        border: 1px solid {border_clr};
         border-radius: 6px;
         padding: 10px 12px;
     ">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-            <div style="width:6px;height:6px;background:{sentinel_color};
+            <div style="width:6px;height:6px;background:{dot_color};
                         border-radius:50%;animation:pulse-dot 1.5s infinite;"></div>
             <span style="font-size:10px;font-weight:700;letter-spacing:.1em;
-                         text-transform:uppercase;color:{COLORS['accent']};">
-                Clerk's note</span>
+                         text-transform:uppercase;color:{dot_color};">
+                {mode_label}
+            </span>
         </div>
         <div style="font-size:10px;color:{COLORS['text_muted']};line-height:1.5;">
-            {'Practice books — mock tallies only' if demo_mode else 'Live line — vault checks running'}
+            {mode_text}
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# ── Route to pages ────────────────────────────────────────────────────────────
+    # ── Debug panel (only visible when Demo Mode is OFF) ─────────────────────
+    if not demo_mode:
+        st.markdown(f"""
+        <div style="padding: 0 16px 8px 16px;">
+            <div style="font-size:10px;color:{COLORS['text_muted']};">
+                Flask:
+                <span style="color:{'#22C55E' if is_live else '#EF4444'};">
+                    {'✅ Connected' if is_live else '❌ Offline'}
+                </span>
+            </div>
+            <div style="font-size:10px;color:{COLORS['text_muted']};margin-top:2px;">
+                MOCK_MODE:
+                <span style="font-family:'JetBrains Mono',monospace;color:{COLORS['accent']};">
+                    {api_client.MOCK_MODE}
+                </span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE ROUTING
+# ─────────────────────────────────────────────────────────────────────────────
 page = st.session_state["active_page"]
 
 try:
@@ -130,22 +216,27 @@ try:
         detection_page.render()
     elif page == "DMCA Reports":
         dmca_page.render()
+
 except Exception as e:
-    # Demo-safe fallback — never show raw traceback
     st.markdown(f"""
     <div style="
-        background:rgba(143,46,46,0.1);
-        border:1px solid rgba(143,46,46,0.28);
-        border-left:3px solid #8F2E2E;
-        border-radius:4px;padding:20px;
-        font-family:'Courier Prime','Courier New',monospace;font-size:12px;
+        background: rgba(239,68,68,0.08);
+        border: 1px solid rgba(239,68,68,0.25);
+        border-left: 3px solid #EF4444;
+        border-radius: 6px;
+        padding: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        margin-top: 20px;
     ">
-        <div style="color:#e8c4c0;font-weight:700;margin-bottom:6px;">
-            ⚠ Runtime Error — Demo Mode Active
+        <div style="color:#FCA5A5;font-weight:700;margin-bottom:8px;">
+            ⚠ Runtime Error — Switching to Demo Mode
         </div>
-        <div style="color:{COLORS['text_muted']}">{str(e)}</div>
-        <div style="color:{COLORS['text_muted']};margin-top:8px;font-size:11px;">
-            Switch to Demo Mode (sidebar toggle) to continue safely.
+        <div style="color:{COLORS['text_muted']};margin-bottom:8px;">{str(e)}</div>
+        <div style="color:{COLORS['text_muted']};font-size:11px;">
+            Enable Demo Mode in the sidebar to continue safely.
         </div>
     </div>
     """, unsafe_allow_html=True)
+    st.session_state["demo_mode"] = True
+    api_client.MOCK_MODE = True
