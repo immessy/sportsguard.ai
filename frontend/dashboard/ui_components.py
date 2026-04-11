@@ -78,8 +78,8 @@ def pending_violations_table_html(rows: list[dict]) -> str:
             "<tr>"
             f'<td><span class="sg-ref">{html_lib.escape(r["ref_id"])}</span></td>'
             f'<td>{html_lib.escape(r["display_url"])}</td>'
-            f'<td style="color:#8b949e">{html_lib.escape(r["platform"])}</td>'
-            f'<td style="color:#ef4444;font-weight:700">{int(r["match_pct"])}%</td>'
+            f'<td style="color:#9c8b7c">{html_lib.escape(r["platform"])}</td>'
+            f'<td style="color:#8f2e2e;font-weight:700">{int(r["match_pct"])}%</td>'
             '<td><span class="sg-pend-pill">⏳ Pending</span></td>'
             "</tr>"
         )
@@ -92,8 +92,8 @@ def copy_to_clipboard_button(text: str) -> None:
     components.html(
         f"""
         <button type="button" id="sg-copy-btn"
-          style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #30363d;
-          background:#161b22;color:#f0f6fc;font-weight:600;cursor:pointer;font-family:Inter,system-ui,sans-serif;font-size:14px;">
+          style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #6b584e;
+          background:#352820;color:#f2e8d5;font-weight:600;cursor:pointer;font-family:Alegreya,Georgia,serif;font-size:14px;">
           Copy to Clipboard
         </button>
         <script>

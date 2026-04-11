@@ -2,7 +2,7 @@ import streamlit as st
 
 # ── Must be first Streamlit call ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="SportsGuard AI — Tactical Hub",
+    page_title="SportsGuard AI — Rights ledger",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -100,8 +100,8 @@ with st.sidebar:
     st.markdown(f"""
     <div style="
         margin: 8px 12px 12px 12px;
-        background: rgba(245,158,11,0.06);
-        border: 1px solid rgba(245,158,11,0.2);
+        background: rgba(143, 46, 46, 0.08);
+        border: 1px solid rgba(143, 46, 46, 0.22);
         border-radius: 6px;
         padding: 10px 12px;
     ">
@@ -110,10 +110,10 @@ with st.sidebar:
                         border-radius:50%;animation:pulse-dot 1.5s infinite;"></div>
             <span style="font-size:10px;font-weight:700;letter-spacing:.1em;
                          text-transform:uppercase;color:{COLORS['accent']};">
-                Sentinel Mode</span>
+                Clerk's note</span>
         </div>
         <div style="font-size:10px;color:{COLORS['text_muted']};line-height:1.5;">
-            {'Demo data active' if demo_mode else 'Live threat monitoring active'}
+            {'Practice books — mock tallies only' if demo_mode else 'Live line — vault checks running'}
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -134,13 +134,13 @@ except Exception as e:
     # Demo-safe fallback — never show raw traceback
     st.markdown(f"""
     <div style="
-        background:rgba(239,68,68,0.08);
-        border:1px solid rgba(239,68,68,0.25);
-        border-left:3px solid #EF4444;
-        border-radius:6px;padding:20px;
-        font-family:'JetBrains Mono',monospace;font-size:12px;
+        background:rgba(143,46,46,0.1);
+        border:1px solid rgba(143,46,46,0.28);
+        border-left:3px solid #8F2E2E;
+        border-radius:4px;padding:20px;
+        font-family:'Courier Prime','Courier New',monospace;font-size:12px;
     ">
-        <div style="color:#FCA5A5;font-weight:700;margin-bottom:6px;">
+        <div style="color:#e8c4c0;font-weight:700;margin-bottom:6px;">
             ⚠ Runtime Error — Demo Mode Active
         </div>
         <div style="color:{COLORS['text_muted']}">{str(e)}</div>

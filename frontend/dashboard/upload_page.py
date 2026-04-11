@@ -9,7 +9,7 @@ def mock_upload_response(title):
         "registry_id":   "SG-7729-AX",
         "fingerprint": {
             "frames_processed":  143,
-            "hash_algorithm":    "pHash-512/Sentinel",
+            "hash_algorithm":    "Perceptual hash (pHash, ledger index)",
             "root_merkle":       "0xBf2a...f921",
         },
         "protection": {
@@ -59,7 +59,7 @@ def render():
             <div>
                 Video registered! 143 frames fingerprinted.
                 <span style="
-                    font-family:'JetBrains Mono',monospace;
+                    font-family:'Courier Prime','Courier New',monospace;
                     color:{COLORS['accent']};
                     font-size:11px;
                     margin-left:12px;
@@ -91,7 +91,7 @@ def render():
             padding:24px;
         ">
         <div style="
-            font-family:'Rajdhani',sans-serif;
+            font-family:'Cormorant Garamond',Georgia,serif;
             font-size:20px;font-weight:700;
             color:{COLORS['text_primary']};
             margin-bottom:6px;
@@ -113,10 +113,10 @@ def render():
         st.markdown(f"""
         <div style="text-align:center;padding:20px 0 12px;">
             <div style="
-                border: 1.5px dashed rgba(245,158,11,0.3);
+                border: 1.5px dashed rgba(143, 46, 46, 0.35);
                 border-radius:10px;
                 padding:28px 20px;
-                background:rgba(245,158,11,0.02);
+                background:rgba(52, 38, 31, 0.4);
             ">
                 <div style="font-size:32px;margin-bottom:8px;">⬆️</div>
                 <div style="font-size:14px;color:{COLORS['text_secondary']};margin-bottom:4px;">
@@ -170,7 +170,7 @@ def render():
                         background:{COLORS['bg_tertiary']};
                         border:1px solid {COLORS['border']};
                         border-radius:6px;padding:12px 16px;
-                        font-family:'JetBrains Mono',monospace;font-size:11px;
+                        font-family:'Courier Prime','Courier New',monospace;font-size:11px;
                         color:{COLORS['accent']};
                         animation: pulse 1s infinite;
                         margin:8px 0;
@@ -219,8 +219,8 @@ def render():
                     position:absolute;bottom:10px;right:10px;
                     font-size:9px;font-weight:700;letter-spacing:.1em;
                     color:{COLORS['accent']};
-                    background:rgba(245,158,11,0.12);
-                    border:1px solid rgba(245,158,11,0.25);
+                    background:rgba(143, 46, 46, 0.14);
+                    border:1px solid rgba(143, 46, 46, 0.28);
                     padding:2px 8px;border-radius:3px;text-transform:uppercase;
                 ">● Fingerprinting Engine Active</div>
             </div>

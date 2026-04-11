@@ -61,7 +61,7 @@ INFRINGEMENT DETAILS:
 ─────────────────────────────────────────────────────
 TITLE:      {v['title_work']}
 URL:        https://{v['url']}
-IDENTIFIER: {v['id']} / Technical Sentinel Hash: {v['hash']}
+IDENTIFIER: {v['id']} / Fingerprint ref: {v['hash']}
 
 The content identified above is being used without authorisation.
 We have a good faith belief that the use of the material in the
@@ -69,15 +69,15 @@ manner complained of is not authorised by the copyright owner, its
 agent, or the law.
 
 MATCH CONFIDENCE: {v['match_pct']}%
-AI CLASSIFICATION: {v['classification']} (Gemini 2.5 Flash)
+CLASSIFIER NOTE (DEMO): {v['classification']}
 RISK SCORE: {v['risk_score']} / 10
 
 I request the immediate removal or disabling of access to the
 infringing material identified above.
 
 Submitted by:
-SportsGuard AI — Automated Rights Protection Engine
-Technical Sentinel Protection Engine © 2026
+SportsGuard AI — Rights desk (demo export)
+Prepared for review only — not a filing.
 
 Generated: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")} UTC
 """
@@ -147,15 +147,15 @@ def render():
         st.markdown(f"""
         <div style="display:flex;justify-content:space-between;align-items:center;
                     margin-bottom:12px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;
+            <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;font-weight:700;
                         letter-spacing:.1em;text-transform:uppercase;
                         color:{COLORS['text_primary']};">
                 Pending Violations
             </div>
             <span style="
-                background:rgba(245,158,11,0.15);
+                background:rgba(143, 46, 46, 0.16);
                 color:{COLORS['accent']};
-                border:1px solid rgba(245,158,11,0.3);
+                border:1px solid rgba(143, 46, 46, 0.32);
                 padding:2px 10px;border-radius:999px;
                 font-size:11px;font-weight:700;
             ">{len(VIOLATIONS)} QUEUED</span>
@@ -205,7 +205,7 @@ def render():
         <div style="display:flex;justify-content:space-between;align-items:center;
                     margin-bottom:10px;">
             <div>
-                <div style="font-family:'Rajdhani',sans-serif;font-size:14px;
+                <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;
                             font-weight:700;letter-spacing:.1em;text-transform:uppercase;
                             color:{COLORS['text_primary']};">
                     Formal DMCA Notice
@@ -220,7 +220,7 @@ def render():
             border:1px solid {COLORS['border']};
             border-radius:8px;
             padding:20px;
-            font-family:'JetBrains Mono',monospace;
+            font-family:'Courier Prime','Courier New',monospace;
             font-size:11px;
             line-height:1.8;
             max-height:380px;
@@ -249,14 +249,12 @@ def render():
     st.markdown(f"""
     <div style="text-align:center;border-top:1px solid {COLORS['border']};
                 padding-top:14px;">
-        <div style="font-size:10px;color:{COLORS['text_muted']};
-                    letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">
-            Built for Google Solution Challenge 2026 &nbsp;•&nbsp;
-            SportsGuard AI &nbsp;•&nbsp;
-            Vibrant Sentinel V1.0
+        <div style="font-size:11px;color:{COLORS['text_secondary']};
+                    letter-spacing:.03em;font-style:italic;margin-bottom:4px;">
+            Google Solution Challenge 2026 · SportsGuard AI — a clerk's desk, not a bot farm.
         </div>
-        <div style="font-size:9px;color:{COLORS['text_muted']};">
-            Technical Sentinel Protection Engine © 2026. All Rights Reserved.
+        <div style="font-size:10px;color:{COLORS['text_muted']};">
+            Demo notices only. Have counsel review anything real.
         </div>
     </div>
     """, unsafe_allow_html=True)

@@ -1,45 +1,63 @@
 import streamlit as st
 
 # ─── Design Tokens ────────────────────────────────────────────────────────────
+# Rustic ledger: weathered wood & leather, oxidized red, cream ink (no stark black)
 COLORS = {
-    "bg_primary":    "#0F172A",
-    "bg_secondary":  "#1E293B",
-    "bg_tertiary":   "#0D1117",
-    "accent":        "#F59E0B",
-    "accent_hover":  "#FBBF24",
-    "accent_dim":    "#92400E",
-    "danger":        "#EF4444",
-    "danger_dim":    "#7F1D1D",
-    "success":       "#22C55E",
-    "success_dim":   "#14532D",
-    "warning":       "#F59E0B",
-    "warning_dim":   "#78350F",
-    "medium":        "#F97316",
-    "medium_dim":    "#7C2D12",
-    "text_primary":  "#F8FAFC",
-    "text_secondary":"#94A3B8",
-    "text_muted":    "#475569",
-    "border":        "#1E293B",
-    "border_accent": "#F59E0B33",
-    "green_neon":    "#84CC16",
+    "bg_primary":    "#4D3F36",   # weathered oak — main field
+    "bg_secondary":  "#5C4D42",   # lifted card / folio
+    "bg_tertiary":   "#352820",   # cellar leather — sidebar
+    "accent":        "#8F2E2E",   # oxidized barn red
+    "accent_hover":  "#A84848",
+    "accent_dim":    "#5C2424",
+    "danger":        "#B04A40",
+    "danger_dim":    "#4A2820",
+    "success":       "#6E8562",   # dried sage
+    "success_dim":   "#3A4534",
+    "warning":       "#A67C2E",   # brass / aged gold
+    "warning_dim":   "#5C4A22",
+    "medium":        "#A0703A",   # rusted iron
+    "medium_dim":    "#5C3D22",
+    "text_primary":  "#F2E8D5",   # cream parchment
+    "text_secondary": "#C9B99E",
+    "text_muted":    "#8A7B6A",
+    "border":        "#6E5E52",
+    "border_accent": "rgba(143, 46, 46, 0.4)",
+    "accent_rgba":   "143, 46, 46",
 }
 
 def inject_global_css():
     st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:wght@500;600;700&family=Courier+Prime:wght@400;700&display=swap');
+
+    :root {{
+        --sg-font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+        --sg-font-body: 'Alegreya', Georgia, 'Times New Roman', serif;
+        --sg-font-mono: 'Courier Prime', 'Courier New', monospace;
+    }}
 
     /* ── Reset & Base ── */
     html, body, [class*="css"] {{
-        font-family: 'Inter', sans-serif !important;
+        font-family: var(--sg-font-body) !important;
         background-color: {COLORS['bg_primary']} !important;
         color: {COLORS['text_primary']} !important;
     }}
     .stApp {{
         background-color: {COLORS['bg_primary']} !important;
         background-image:
-            radial-gradient(ellipse at 20% 0%, rgba(245,158,11,0.06) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 100%, rgba(132,204,22,0.04) 0%, transparent 50%);
+            radial-gradient(ellipse at 12% 5%, rgba(143, 46, 46, 0.07) 0%, transparent 50%),
+            radial-gradient(ellipse at 88% 95%, rgba(45, 32, 24, 0.35) 0%, transparent 45%),
+            linear-gradient(175deg, rgba(78, 62, 52, 0.5) 0%, {COLORS['bg_primary']} 42%);
+    }}
+    /* Subtle paper / linen grain — feels hand-made, not glass UI */
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 5;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
     }}
 
     /* ── Hide Streamlit chrome ── */
@@ -70,9 +88,9 @@ def inject_global_css():
         display: flex !important;
         align-items: center !important;
         padding: 10px 16px !important;
-        border-radius: 6px !important;
+        border-radius: 3px !important;
         cursor: pointer !important;
-        font-size: 13px !important;
+        font-size: 14px !important;
         font-weight: 500 !important;
         color: {COLORS['text_secondary']} !important;
         transition: all 0.15s ease !important;
@@ -80,13 +98,13 @@ def inject_global_css():
         margin: 1px 8px !important;
     }}
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {{
-        background: rgba(245,158,11,0.08) !important;
-        color: {COLORS['accent']} !important;
+        background: rgba(143, 46, 46, 0.1) !important;
+        color: {COLORS['accent_hover']} !important;
         border-left-color: {COLORS['accent']} !important;
     }}
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label[data-checked="true"],
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] input:checked + div {{
-        background: rgba(245,158,11,0.12) !important;
+        background: rgba(143, 46, 46, 0.16) !important;
         color: {COLORS['accent']} !important;
         border-left-color: {COLORS['accent']} !important;
     }}
@@ -110,18 +128,20 @@ def inject_global_css():
         background: {COLORS['bg_secondary']};
         border: 1px solid {COLORS['border']};
         border-top: 2px solid {COLORS['accent']};
-        border-radius: 8px;
+        border-radius: 4px;
         padding: 20px 24px;
         position: relative;
         overflow: hidden;
         transition: border-color 0.2s;
+        box-shadow: inset 0 1px 0 rgba(242, 232, 213, 0.07),
+                    2px 3px 0 rgba(26, 18, 14, 0.28);
     }}
     .sg-metric-card::before {{
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0;
         height: 60px;
-        background: linear-gradient(180deg, rgba(245,158,11,0.06) 0%, transparent 100%);
+        background: linear-gradient(180deg, rgba(143, 46, 46, 0.08) 0%, transparent 100%);
         pointer-events: none;
     }}
     .sg-metric-card:hover {{
@@ -137,7 +157,7 @@ def inject_global_css():
         margin-bottom: 8px;
     }}
     .sg-metric-value {{
-        font-family: 'Rajdhani', sans-serif;
+        font-family: var(--sg-font-display);
         font-size: 42px;
         font-weight: 700;
         color: {COLORS['text_primary']};
@@ -171,11 +191,12 @@ def inject_global_css():
         margin-bottom: 12px;
     }}
     .sg-section-title {{
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
+        font-family: var(--sg-font-display);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: none;
+        font-variant: small-caps;
         color: {COLORS['text_primary']};
     }}
     .sg-live-dot {{
@@ -187,16 +208,17 @@ def inject_global_css():
         flex-shrink: 0;
     }}
     @keyframes pulse-dot {{
-        0%, 100% {{ box-shadow: 0 0 0 0 rgba(245,158,11,0.6); }}
-        50% {{ box-shadow: 0 0 0 5px rgba(245,158,11,0); }}
+        0%, 100% {{ box-shadow: 0 0 0 0 rgba(143, 46, 46, 0.45); }}
+        50% {{ box-shadow: 0 0 0 5px rgba(143, 46, 46, 0); }}
     }}
 
     /* ── Panel / card container ── */
     .sg-panel {{
         background: {COLORS['bg_secondary']};
         border: 1px solid {COLORS['border']};
-        border-radius: 8px;
+        border-radius: 4px;
         padding: 20px;
+        box-shadow: inset 0 1px 0 rgba(242, 232, 213, 0.05);
     }}
 
     /* ── Risk badges ── */
@@ -213,23 +235,23 @@ def inject_global_css():
         white-space: nowrap;
     }}
     .badge-critical {{
-        background: rgba(239,68,68,0.18);
-        color: #FCA5A5;
-        border: 1px solid rgba(239,68,68,0.3);
+        background: rgba(143, 46, 46, 0.2);
+        color: #e8c4c0;
+        border: 1px solid rgba(143, 46, 46, 0.4);
     }}
     .badge-medium {{
-        background: rgba(249,115,22,0.18);
-        color: #FDBA74;
-        border: 1px solid rgba(249,115,22,0.3);
+        background: rgba(193, 127, 58, 0.18);
+        color: #e8c9a8;
+        border: 1px solid rgba(193, 127, 58, 0.35);
     }}
     .badge-low {{
-        background: rgba(34,197,94,0.15);
-        color: #86EFAC;
-        border: 1px solid rgba(34,197,94,0.25);
+        background: rgba(125, 154, 110, 0.18);
+        color: #d4e4cc;
+        border: 1px solid rgba(125, 154, 110, 0.35);
     }}
-    .badge-piracy    {{ background: rgba(239,68,68,0.18);  color: #FCA5A5; border: 1px solid rgba(239,68,68,0.3); }}
-    .badge-transform {{ background: rgba(249,115,22,0.18); color: #FDBA74; border: 1px solid rgba(249,115,22,0.3); }}
-    .badge-meme      {{ background: rgba(34,197,94,0.15);  color: #86EFAC; border: 1px solid rgba(34,197,94,0.25); }}
+    .badge-piracy    {{ background: rgba(143, 46, 46, 0.2);  color: #e8c4c0; border: 1px solid rgba(143, 46, 46, 0.4); }}
+    .badge-transform {{ background: rgba(193, 127, 58, 0.18); color: #e8c9a8; border: 1px solid rgba(193, 127, 58, 0.35); }}
+    .badge-meme      {{ background: rgba(125, 154, 110, 0.18);  color: #d4e4cc; border: 1px solid rgba(125, 154, 110, 0.35); }}
 
     /* ── Detection table ── */
     .sg-table {{ width: 100%; border-collapse: collapse; }}
@@ -247,12 +269,12 @@ def inject_global_css():
         font-size: 12px;
         color: {COLORS['text_secondary']};
         padding: 11px 12px;
-        border-bottom: 1px solid rgba(30,41,59,0.6);
+        border-bottom: 1px solid rgba(107, 88, 78, 0.45);
         vertical-align: middle;
     }}
-    .sg-table tr:hover td {{ background: rgba(245,158,11,0.04); color: {COLORS['text_primary']}; }}
+    .sg-table tr:hover td {{ background: rgba(143, 46, 46, 0.07); color: {COLORS['text_primary']}; }}
     .sg-table .url-cell {{
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--sg-font-mono);
         font-size: 11px;
         color: {COLORS['text_primary']};
         max-width: 200px;
@@ -260,15 +282,15 @@ def inject_global_css():
         overflow: hidden;
         text-overflow: ellipsis;
     }}
-    .sg-table .conf-high {{ color: {COLORS['danger']}; font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 14px; }}
-    .sg-table .conf-med  {{ color: {COLORS['medium']}; font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 14px; }}
-    .sg-table .conf-low  {{ color: {COLORS['success']}; font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 14px; }}
+    .sg-table .conf-high {{ color: {COLORS['danger']}; font-weight: 700; font-family: var(--sg-font-display); font-size: 14px; }}
+    .sg-table .conf-med  {{ color: {COLORS['medium']}; font-weight: 700; font-family: var(--sg-font-display); font-size: 14px; }}
+    .sg-table .conf-low  {{ color: {COLORS['success']}; font-weight: 700; font-family: var(--sg-font-display); font-size: 14px; }}
 
     /* ── Action buttons in table ── */
     .btn-takedown {{
-        background: rgba(239,68,68,0.15);
-        color: #FCA5A5;
-        border: 1px solid rgba(239,68,68,0.35);
+        background: rgba(143, 46, 46, 0.18);
+        color: #e8c4c0;
+        border: 1px solid rgba(143, 46, 46, 0.4);
         padding: 3px 9px;
         border-radius: 4px;
         font-size: 10px;
@@ -278,9 +300,9 @@ def inject_global_css():
         text-transform: uppercase;
     }}
     .btn-review {{
-        background: rgba(249,115,22,0.12);
-        color: #FDBA74;
-        border: 1px solid rgba(249,115,22,0.3);
+        background: rgba(193, 127, 58, 0.14);
+        color: #e8c9a8;
+        border: 1px solid rgba(193, 127, 58, 0.35);
         padding: 3px 9px;
         border-radius: 4px;
         font-size: 10px;
@@ -290,9 +312,9 @@ def inject_global_css():
         text-transform: uppercase;
     }}
     .btn-ignore {{
-        background: rgba(71,85,105,0.3);
+        background: rgba(107, 88, 78, 0.35);
         color: {COLORS['text_secondary']};
-        border: 1px solid rgba(71,85,105,0.4);
+        border: 1px solid rgba(107, 88, 78, 0.5);
         padding: 3px 9px;
         border-radius: 4px;
         font-size: 10px;
@@ -305,25 +327,26 @@ def inject_global_css():
     /* ── Primary CTA button ── */
     .stButton > button {{
         background: {COLORS['accent']} !important;
-        color: #0F172A !important;
+        color: {COLORS['text_primary']} !important;
         border: none !important;
-        border-radius: 6px !important;
-        font-family: 'Rajdhani', sans-serif !important;
-        font-weight: 700 !important;
+        border-radius: 3px !important;
+        font-family: var(--sg-font-body) !important;
+        font-weight: 600 !important;
         font-size: 15px !important;
-        letter-spacing: 0.06em !important;
+        letter-spacing: 0.04em !important;
         padding: 10px 24px !important;
-        transition: all 0.15s ease !important;
-        text-transform: uppercase !important;
+        transition: background 0.2s ease, box-shadow 0.2s ease !important;
+        text-transform: none !important;
+        font-variant: small-caps !important;
         width: 100% !important;
+        box-shadow: 1px 2px 0 rgba(26, 18, 14, 0.35) !important;
     }}
     .stButton > button:hover {{
         background: {COLORS['accent_hover']} !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 20px rgba(245,158,11,0.35) !important;
+        box-shadow: 2px 3px 0 rgba(26, 18, 14, 0.3) !important;
     }}
     .stButton > button:active {{
-        transform: translateY(0px) !important;
+        box-shadow: 1px 1px 0 rgba(26, 18, 14, 0.4) !important;
     }}
 
     /* ── Outlined button variant ── */
@@ -333,7 +356,7 @@ def inject_global_css():
         border: 1px solid {COLORS['accent']} !important;
     }}
     .btn-outlined:hover {{
-        background: rgba(245,158,11,0.1) !important;
+        background: rgba(143, 46, 46, 0.12) !important;
     }}
 
     /* ── Log panel ── */
@@ -342,7 +365,7 @@ def inject_global_css():
         border: 1px solid {COLORS['border']};
         border-radius: 8px;
         padding: 16px;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--sg-font-mono);
         font-size: 11px;
         line-height: 1.7;
         max-height: 160px;
@@ -355,17 +378,17 @@ def inject_global_css():
 
     /* ── Upload zone ── */
     .sg-upload-zone {{
-        border: 1.5px dashed rgba(245,158,11,0.35);
+        border: 1.5px dashed rgba(143, 46, 46, 0.4);
         border-radius: 10px;
         padding: 40px 24px;
         text-align: center;
-        background: rgba(245,158,11,0.03);
+        background: rgba(52, 38, 31, 0.35);
         transition: all 0.2s;
         cursor: pointer;
     }}
     .sg-upload-zone:hover {{
         border-color: {COLORS['accent']};
-        background: rgba(245,158,11,0.06);
+        background: rgba(143, 46, 46, 0.08);
     }}
     .sg-upload-icon {{
         font-size: 36px;
@@ -389,7 +412,7 @@ def inject_global_css():
         border-left: 3px solid {COLORS['accent']};
         border-radius: 6px;
         padding: 16px;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--sg-font-mono);
         font-size: 11px;
         line-height: 1.7;
         color: {COLORS['text_secondary']};
@@ -397,8 +420,8 @@ def inject_global_css():
         overflow-x: auto;
     }}
     .json-key   {{ color: {COLORS['accent']}; }}
-    .json-str   {{ color: #86EFAC; }}
-    .json-num   {{ color: #93C5FD; }}
+    .json-str   {{ color: #c4d4b8; }}
+    .json-num   {{ color: #d4c4b6; }}
     .json-bool  {{ color: #F9A8D4; }}
 
     /* ── Inputs ── */
@@ -412,7 +435,7 @@ def inject_global_css():
     }}
     .stTextInput > div > div > input:focus {{
         border-color: {COLORS['accent']} !important;
-        box-shadow: 0 0 0 2px rgba(245,158,11,0.15) !important;
+        box-shadow: 0 0 0 2px rgba(143, 46, 46, 0.2) !important;
     }}
     .stTextInput label, .stSelectbox label {{
         font-size: 10px !important;
@@ -425,7 +448,7 @@ def inject_global_css():
     /* ── File uploader ── */
     [data-testid="stFileUploader"] {{
         background: {COLORS['bg_tertiary']};
-        border: 1.5px dashed rgba(245,158,11,0.3);
+        border: 1.5px dashed rgba(143, 46, 46, 0.35);
         border-radius: 10px;
         padding: 8px;
     }}
@@ -463,7 +486,7 @@ def inject_global_css():
 
     /* ── Page title ── */
     .sg-page-title {{
-        font-family: 'Rajdhani', sans-serif;
+        font-family: var(--sg-font-display);
         font-size: 32px;
         font-weight: 700;
         color: {COLORS['text_primary']};
@@ -481,22 +504,23 @@ def inject_global_css():
         gap: 8px;
     }}
     .sg-status-live {{
-        color: {COLORS['accent']};
-        font-weight: 700;
-        font-size: 10px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        padding: 2px 8px;
-        background: rgba(245,158,11,0.12);
-        border-radius: 3px;
-        border: 1px solid rgba(245,158,11,0.25);
+        color: {COLORS['text_secondary']};
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        font-style: italic;
+        padding: 3px 10px;
+        background: rgba(53, 40, 32, 0.45);
+        border-radius: 2px;
+        border: 1px solid {COLORS['border']};
     }}
 
     /* ── Warning / info banners ── */
     .sg-banner-warning {{
-        background: rgba(245,158,11,0.08);
-        border: 1px solid rgba(245,158,11,0.25);
-        border-left: 3px solid {COLORS['accent']};
+        background: rgba(184, 134, 11, 0.1);
+        border: 1px solid rgba(184, 134, 11, 0.35);
+        border-left: 3px solid {COLORS['warning']};
         border-radius: 6px;
         padding: 12px 16px;
         font-size: 12px;
@@ -507,13 +531,13 @@ def inject_global_css():
         gap: 10px;
     }}
     .sg-banner-success {{
-        background: rgba(34,197,94,0.08);
-        border: 1px solid rgba(34,197,94,0.25);
+        background: rgba(125, 154, 110, 0.12);
+        border: 1px solid rgba(125, 154, 110, 0.35);
         border-left: 3px solid {COLORS['success']};
         border-radius: 6px;
         padding: 12px 16px;
         font-size: 12px;
-        color: #86EFAC;
+        color: #dce8d4;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
@@ -521,13 +545,13 @@ def inject_global_css():
         font-weight: 500;
     }}
     .sg-banner-info {{
-        background: rgba(59,130,246,0.07);
-        border: 1px solid rgba(59,130,246,0.2);
-        border-left: 3px solid #3B82F6;
+        background: rgba(107, 88, 78, 0.35);
+        border: 1px solid rgba(209, 196, 182, 0.25);
+        border-left: 3px solid {COLORS['text_secondary']};
         border-radius: 6px;
         padding: 12px 16px;
         font-size: 12px;
-        color: #93C5FD;
+        color: {COLORS['text_secondary']};
         margin-bottom: 16px;
     }}
 
@@ -540,7 +564,7 @@ def inject_global_css():
         font-size: 12px;
         color: {COLORS['text_secondary']};
         line-height: 1.8;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--sg-font-mono);
         white-space: pre-wrap;
     }}
     .dmca-heading {{
@@ -568,10 +592,10 @@ def inject_global_css():
     }}
     .sg-violation-card.active {{
         border-color: {COLORS['accent']};
-        background: rgba(245,158,11,0.05);
+        background: rgba(143, 46, 46, 0.08);
     }}
     .sg-violation-id {{
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--sg-font-mono);
         font-size: 10px;
         color: {COLORS['accent']};
         margin-bottom: 4px;
@@ -586,7 +610,7 @@ def inject_global_css():
     .sg-violation-url {{
         font-size: 10px;
         color: {COLORS['text_muted']};
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--sg-font-mono);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -605,20 +629,22 @@ def inject_global_css():
     .sg-integrity-panel {{
         background: {COLORS['bg_secondary']};
         border: 1px solid {COLORS['border']};
-        border-radius: 8px;
+        border-radius: 4px;
         padding: 20px;
         text-align: center;
+        box-shadow: inset 0 1px 0 rgba(242, 232, 213, 0.05);
     }}
     .sg-integrity-icon {{
         font-size: 40px;
         margin-bottom: 10px;
     }}
     .sg-integrity-title {{
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
+        font-family: var(--sg-font-display);
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        font-variant: small-caps;
         color: {COLORS['text_primary']};
         margin-bottom: 8px;
     }}
@@ -680,16 +706,16 @@ def render_sidebar_logo():
             <div style="
                 width: 32px; height: 32px;
                 background: {COLORS['accent']};
-                border-radius: 6px;
+                border-radius: 2px;
                 display: flex; align-items: center; justify-content: center;
                 font-size: 16px;
-                color: #0F172A;
+                color: {COLORS['text_primary']};
                 font-weight: 900;
                 flex-shrink: 0;
             ">🛡</div>
             <div>
                 <div style="
-                    font-family: 'Rajdhani', sans-serif;
+                    font-family: var(--sg-font-display);
                     font-size: 16px;
                     font-weight: 700;
                     color: {COLORS['text_primary']};
@@ -701,7 +727,7 @@ def render_sidebar_logo():
                     color: {COLORS['text_muted']};
                     letter-spacing: 0.12em;
                     text-transform: uppercase;
-                ">Tactical Hub</div>
+                ">Rights ledger</div>
             </div>
         </div>
     </div>
@@ -711,7 +737,7 @@ def render_sidebar_logo():
 def render_sidebar_status(backend_live=True, demo_mode=True):
     status_color  = COLORS['success'] if backend_live else COLORS['danger']
     status_text   = "Backend Live"   if backend_live else "Backend Offline"
-    demo_bg       = "rgba(245,158,11,0.15)" if demo_mode else "transparent"
+    demo_bg       = "rgba(143, 46, 46, 0.18)" if demo_mode else "transparent"
     demo_color    = COLORS['accent']        if demo_mode else COLORS['text_muted']
     st.markdown(f"""
     <div style="
@@ -745,7 +771,7 @@ def metric_card(label, value, delta, delta_type="up", icon="📊"):
 
 def section_header(title, live=False, view_all=False):
     live_dot  = '<div class="sg-live-dot"></div>' if live else ""
-    view_link = '<span class="sg-view-all">VIEW ALL →</span>' if view_all else ""
+    view_link = '<span class="sg-view-all">Full register →</span>' if view_all else ""
     st.markdown(f"""
     <div class="sg-section-header" style="display:flex;align-items:center;width:100%;">
         {live_dot}
@@ -775,6 +801,6 @@ def page_header(title, subtitle=None, breadcrumb=None, show_active=True):
     <div class="sg-page-title">{title}</div>
     <div class="sg-page-subtitle">
         {subtitle or ""}
-        {"<span class='sg-status-live'>● ACTIVE MONITORING</span>" if show_active else ""}
+        {"<span class='sg-status-live'>On duty · match week</span>" if show_active else ""}
     </div>
     """, unsafe_allow_html=True)

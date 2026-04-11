@@ -45,7 +45,7 @@ BASE_DETECTIONS = [
         "ts":          "13:45:33",
         "source_url":  "iptv-leak-stream.biz",
         "source_id":   "ID: IP-77033",
-        "content":     "Multi-stream Hub",
+        "content":     "Unofficial stream roundup",
         "risk":        "CRITICAL",
         "status":      "Live Now",
         "status_dot":  "danger",
@@ -72,10 +72,10 @@ SIMULATED_DETECTION = {
 }
 
 STATUS_DOT_COLORS = {
-    "danger":  "#EF4444",
-    "medium":  "#F97316",
-    "success": "#22C55E",
-    "info":    "#3B82F6",
+    "danger":  "#C24A3E",
+    "medium":  "#C17F3A",
+    "success": "#7D9A6E",
+    "info":    "#9C8B7C",
 }
 
 ACTION_BTNS = {
@@ -102,13 +102,13 @@ def render_detection_table(detections):
 
         rows_html += f"""
         <tr>
-            <td style="font-family:'JetBrains Mono',monospace;font-size:11px;
+            <td style="font-family:'Courier Prime','Courier New',monospace;font-size:11px;
                        color:{COLORS['text_secondary']};">{d['ts']}</td>
             <td>
                 <div style="font-size:12px;color:{COLORS['text_primary']};
                             font-weight:500;">{d['source_url']}</div>
                 <div style="font-size:10px;color:{COLORS['text_muted']};
-                            font-family:'JetBrains Mono',monospace;">{d['source_id']}</div>
+                            font-family:'Courier Prime','Courier New',monospace;">{d['source_id']}</div>
             </td>
             <td>
                 <div style="font-size:12px;color:{COLORS['text_secondary']};
@@ -163,7 +163,7 @@ def render():
         ">
             <span style="font-size:10px;color:{COLORS['text_muted']};
                          letter-spacing:.1em;text-transform:uppercase;">Scanned Today</span>
-            <span style="font-family:'Rajdhani',sans-serif;font-size:22px;
+            <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;
                          font-weight:700;color:{COLORS['text_primary']};">1,247</span>
         </div>
         <div style="
@@ -174,7 +174,7 @@ def render():
         ">
             <span style="font-size:10px;color:{COLORS['text_muted']};
                          letter-spacing:.1em;text-transform:uppercase;">Flagged</span>
-            <span style="font-family:'Rajdhani',sans-serif;font-size:22px;
+            <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;
                          font-weight:700;color:{COLORS['medium']};">23</span>
         </div>
         <div style="
@@ -185,7 +185,7 @@ def render():
         ">
             <span style="font-size:10px;color:{COLORS['text_muted']};
                          letter-spacing:.1em;text-transform:uppercase;">High Risk</span>
-            <span style="font-family:'Rajdhani',sans-serif;font-size:22px;
+            <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;
                          font-weight:700;color:{COLORS['danger']};">8</span>
         </div>
         <div style="margin-left:auto;display:flex;align-items:center;"></div>
@@ -235,13 +235,13 @@ def render():
     # ── Simulate Detection CTA ────────────────────────────────────────────────
     st.markdown(f"""
     <div style="
-        border: 1.5px dashed rgba(245,158,11,0.3);
+        border: 1.5px dashed rgba(143, 46, 46, 0.38);
         border-radius: 8px;
         padding: 2px;
     ">
     """, unsafe_allow_html=True)
 
-    if st.button("⚠️  SIMULATE DETECTION", key="simulate_btn"):
+    if st.button("Add practice detection", key="simulate_btn"):
         new = SIMULATED_DETECTION.copy()
         st.session_state["detections_list"] = [new] + st.session_state["detections_list"]
         st.balloons()
@@ -254,7 +254,7 @@ def render():
     st.markdown(f"""
     <div style="text-align:center;margin-top:10px;">
         <span style="font-size:10px;color:{COLORS['text_muted']};">
-            ⚙ Neural engine scanning 18,200 requests/sec across 24 nodes
+            Hand-tallied checks against the fingerprint vault (demo cadence)
         </span>
     </div>
     """, unsafe_allow_html=True)

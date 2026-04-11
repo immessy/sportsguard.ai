@@ -1,13 +1,14 @@
 [theme]
-primaryColor        = "#F59E0B"
-backgroundColor     = "#0F172A"
-secondaryBackgroundColor = "#1E293B"
-textColor           = "#F8FAFC"
-font                = "sans serif"
+# Rustic ledger: leather brown, oxidized red, cream parchment
+primaryColor              = "#8F2E2E"
+backgroundColor           = "#4D3F36"
+secondaryBackgroundColor  = "#5C4D42"
+textColor                 = "#F2E8D5"
+font                      = "serif"
 
 [server]
-headless            = true
-enableCORS          = false
+headless                  = true
+enableCORS                = false
 
 [browser]
-gatherUsageStats    = false
+gatherUsageStats          = false

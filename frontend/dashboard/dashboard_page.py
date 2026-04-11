@@ -64,8 +64,8 @@ def render_spread_chart():
         y=SPREAD_DATA["violations"],
         mode="lines",
         fill="tozeroy",
-        fillcolor="rgba(132,204,22,0.08)",
-        line=dict(color=COLORS["green_neon"], width=2.5, shape="spline"),
+        fillcolor="rgba(143, 46, 46, 0.16)",
+        line=dict(color=COLORS["accent"], width=2.5, shape="spline"),
         showlegend=False,
         hovertemplate="<b>%{x}</b><br>Violations: %{y}<extra></extra>",
     ))
@@ -78,7 +78,7 @@ def render_spread_chart():
         xaxis=dict(
             showgrid=False,
             showline=False,
-            tickfont=dict(size=9, color=COLORS["text_muted"], family="JetBrains Mono"),
+            tickfont=dict(size=9, color=COLORS["text_muted"], family="Courier Prime"),
             tickvals=["09:00","12:00","15:00","18:00"],
         ),
         yaxis=dict(showgrid=False, showline=False, showticklabels=False),
@@ -86,7 +86,7 @@ def render_spread_chart():
         hoverlabel=dict(
             bgcolor=COLORS["bg_secondary"],
             font_size=11,
-            font_family="JetBrains Mono",
+            font_family="Courier Prime",
         ),
     )
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
@@ -107,7 +107,7 @@ def render_detection_table(detections, max_rows=4):
             <td><span class="{conf_cls}">{pct}%</span></td>
             <td>{badge}</td>
             <td>{risk_b}</td>
-            <td style="font-family:'JetBrains Mono',monospace;font-size:11px;
+            <td style="font-family:'Courier Prime','Courier New',monospace;font-size:11px;
                        color:{COLORS['text_muted']}">{d['detected_at']}</td>
         </tr>"""
 
@@ -144,19 +144,19 @@ def render_log_panel(logs):
         display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;
     ">
         <div style="
-            font-family:'Rajdhani',sans-serif;
+            font-family:'Cormorant Garamond',Georgia,serif;
             font-size:12px;font-weight:700;
             letter-spacing:0.12em;text-transform:uppercase;
             color:{COLORS['text_secondary']};
-        ">Neural Engine Logs</div>
+        ">Office logbook</div>
         <span style="
-            font-size:9px;font-weight:700;
-            color:{COLORS['accent']};
-            background:rgba(245,158,11,0.12);
-            padding:2px 8px;border-radius:3px;
-            letter-spacing:0.1em;text-transform:uppercase;
-            border:1px solid rgba(245,158,11,0.25);
-        ">AUTO-SCAN ENABLED</span>
+            font-size:10px;font-weight:600;
+            color:{COLORS['text_secondary']};
+            background:rgba(143, 46, 46, 0.12);
+            padding:2px 8px;border-radius:2px;
+            letter-spacing:0.04em;font-style:italic;
+            border:1px solid rgba(143, 46, 46, 0.26);
+        ">Routine watch</span>
     </div>
     <div class="sg-log-panel">{lines}</div>
     """, unsafe_allow_html=True)
@@ -167,10 +167,10 @@ def render_integrity_panel():
     st.markdown(f"""
     <div class="sg-integrity-panel">
         <div class="sg-integrity-icon">🛡️</div>
-        <div class="sg-integrity-title">System Integrity</div>
+        <div class="sg-integrity-title">Vault seal</div>
         <div class="sg-integrity-text">
-            All defensive neural nodes are operational.<br>
-            Within optimal latency parameters.
+            Fingerprints and tallies stay on this desk until you say otherwise.<br>
+            Demo build — no outbound filings.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -186,9 +186,9 @@ def render():
         border-bottom: 1px solid {COLORS['border']};
         margin-bottom: 20px;
     ">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;
+        <div style="font-family:'Courier Prime','Courier New',monospace;font-size:10px;
                     color:{COLORS['text_muted']};letter-spacing:0.1em;">
-            SESSION ID: <span style="color:{COLORS['accent']}">SG-2026-IPL</span>
+            Docket: <span style="color:{COLORS['accent']}">SG-2026 · IPL window</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
             <div style="
@@ -250,7 +250,7 @@ def render():
                 <div style="font-size:9px;color:{COLORS['text_muted']};
                             text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">
                     Peak Violations</div>
-                <div style="font-family:'Rajdhani',sans-serif;font-size:20px;
+                <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;
                             font-weight:700;color:{COLORS['text_primary']};">
                     14 <span style="font-size:11px;color:{COLORS['text_muted']}">/min</span></div>
             </div>""", unsafe_allow_html=True)
@@ -260,7 +260,7 @@ def render():
                 <div style="font-size:9px;color:{COLORS['text_muted']};
                             text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">
                     Total Volume</div>
-                <div style="font-family:'Rajdhani',sans-serif;font-size:20px;
+                <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;
                             font-weight:700;color:{COLORS['text_primary']};">
                     1.2 <span style="font-size:11px;color:{COLORS['text_muted']}">GB/s</span></div>
             </div>""", unsafe_allow_html=True)
