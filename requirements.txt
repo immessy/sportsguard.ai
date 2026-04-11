@@ -1,0 +1,13 @@
+# SportsGuard AI — Python Dependencies
+# Install: pip install -r requirements.txt
+# Python >= 3.10 required.
+
+flask>=3.0
+flask-cors>=4.0
+opencv-python>=4.9
+imagehash>=4.3
+Pillow>=10.0
+google-genai>=1.0
+numpy>=1.26
+pytest>=8.0
+pybind11>=2.12

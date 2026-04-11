@@ -1,0 +1,92 @@
+[
+  {
+    "tweet_text": "\ud83d\udd25 FULL IPL 2026 Final \u2014 MI vs CSK! Watch FREE in HD, no ads! Link in bio \ud83c\udfd0\ud83d\udcaf #IPL #FreeStream #IPL2026",
+    "username": "@full_match_free",
+    "timestamp": "2026-04-08T14:30:00Z",
+    "platform": "Twitter",
+    "scenario": "piracy",
+    "expected_classification": "Piracy",
+    "expected_risk_score_min": 75
+  },
+  {
+    "tweet_text": "Streaming full match replay \ud83d\udd34 LIVE #NFL #football \u2014 watch before it's taken down! DM for link",
+    "username": "@nfl_leaks_2026",
+    "timestamp": "2026-04-08T06:05:00Z",
+    "platform": "Twitter",
+    "scenario": "piracy",
+    "expected_classification": "Piracy",
+    "expected_risk_score_min": 80
+  },
+  {
+    "tweet_text": "FULL BROADCAST of the Olympics 100m final \u2014 no commentary, raw feed, HD quality",
+    "username": "@sports_pirate_xD",
+    "timestamp": "2026-04-08T06:20:00Z",
+    "platform": "Twitter",
+    "scenario": "piracy",
+    "expected_classification": "Piracy",
+    "expected_risk_score_min": 80
+  },
+  {
+    "tweet_text": "Streaming the F1 race RIGHT NOW \u2014 link in bio \ud83c\udfce\ufe0f #F1 #GrandPrix #FreeStream",
+    "username": "@f1_stream_free",
+    "timestamp": "2026-04-08T06:30:00Z",
+    "platform": "Twitter",
+    "scenario": "piracy",
+    "expected_classification": "Piracy",
+    "expected_risk_score_min": 75
+  },
+  {
+    "tweet_text": "Bumrah's yorker sequence \u2014 why this over changed the game. Full tactical analysis with slow-mo breakdown \ud83d\udcca\ud83c\udfd0 #CricketAnalysis #Tactics",
+    "username": "@TacticalBreakdown",
+    "timestamp": "2026-04-08T16:45:00Z",
+    "platform": "YouTube",
+    "scenario": "transformative",
+    "expected_classification": "Transformative",
+    "expected_risk_score_max": 50
+  },
+  {
+    "tweet_text": "Analysis: Why this corner kick strategy changed the game \u2014 arrows and slow-mo breakdown #tactics #coaching #FootballAnalysis",
+    "username": "@coachingnerds",
+    "timestamp": "2026-04-08T06:25:00Z",
+    "platform": "Twitter",
+    "scenario": "transformative",
+    "expected_classification": "Transformative",
+    "expected_risk_score_max": 50
+  },
+  {
+    "tweet_text": "Breakdown of Virat's cover drive technique. Notice the footwork at 0:08 \u2014 educational content for aspiring cricketers #CricketCoaching",
+    "username": "@tactical_cricket",
+    "timestamp": "2026-04-08T09:00:00Z",
+    "platform": "Twitter",
+    "scenario": "transformative",
+    "expected_classification": "Transformative",
+    "expected_risk_score_max": 50
+  },
+  {
+    "tweet_text": "POV: Dhoni walks in at 160/5 \ud83d\ude24\ud83d\udd25 #ThalaForAReason #CSK #CricketMeme #MondayVibes",
+    "username": "@cricket_memes_daily",
+    "timestamp": "2026-04-08T19:10:00Z",
+    "platform": "Instagram",
+    "scenario": "meme",
+    "expected_classification": "Meme",
+    "expected_risk_score_max": 30
+  },
+  {
+    "tweet_text": "LMAO this tennis meme is everything \ud83c\udfbe When the ref calls OUT but it was clearly IN \ud83d\ude02 #Wimbledon #meme #SportsMemes",
+    "username": "@memequeen",
+    "timestamp": "2026-04-08T06:15:00Z",
+    "platform": "Twitter",
+    "scenario": "meme",
+    "expected_classification": "Meme",
+    "expected_risk_score_max": 30
+  },
+  {
+    "tweet_text": "When the ref makes THAT call \ud83d\ude24 (comedy clip) My reaction was priceless \ud83d\ude02 #hockey #NHL #FunnyMoments",
+    "username": "@icehockeyhumor",
+    "timestamp": "2026-04-08T06:35:00Z",
+    "platform": "Twitter",
+    "scenario": "meme",
+    "expected_classification": "Meme",
+    "expected_risk_score_max": 30
+  }
+]
