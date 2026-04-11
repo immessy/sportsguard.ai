@@ -1,19 +1,36 @@
+import streamlit as st
+from streamlit.errors import StreamlitAPIException
+
+# Correct Streamlit API: use page_title (not title). Icon shortcode avoids Windows emoji issues.
+try:
+    st.set_page_config(
+        page_title="SportsGuard AI",
+        layout="wide",
+        page_icon=":shield:",
+        initial_sidebar_state="expanded",
+    )
+except StreamlitAPIException:
+    pass
+
 import time
 
 import pandas as pd
-import streamlit as st
+import plotly.express as px
 
-
-st.set_page_config(
-    title="SportsGuard AI",
-    layout="wide",
-    page_icon="🛡️",
+from mock_data import (
+    DASHBOARD_FEED_ROWS,
+    DETECTION_FEED_BASE_ROWS,
+    DMCA_CASES,
+    PROPAGATION_ROWS,
+    SIMULATED_PIRACY_ROW,
+    build_dmca_notice,
 )
 
 st.sidebar.title("Navigation")
 page = st.sidebar.radio(
-    label="",
+    "Section",
     options=["Dashboard", "Upload", "Detection Feed", "DMCA Reports"],
+    label_visibility="collapsed",
 )
 
 st.title("🛡️ SportsGuard AI — Rights Protection Dashboard")
@@ -26,47 +43,21 @@ if page == "Dashboard":
 
     st.subheader("Live Detection Feed")
 
-    df = pd.DataFrame(
-        [
-            {
-                "Source URL": "https://twitter.com/cricketbuzz/status/1782049912001234567",
-                "Match Confidence": "96.2%",
-                "Gemini Classification": "🔴 Piracy",
-                "Risk Score": 9,
-                "Detected At": "2026-04-08 11:42:08",
-            },
-            {
-                "Source URL": "https://t.me/ipl_highlights/8421",
-                "Match Confidence": "92.8%",
-                "Gemini Classification": "🔴 Piracy",
-                "Risk Score": 8,
-                "Detected At": "2026-04-08 11:39:51",
-            },
-            {
-                "Source URL": "https://youtube.com/watch?v=Qx9wz2pL7kA",
-                "Match Confidence": "88.4%",
-                "Gemini Classification": "🟡 Transformative",
-                "Risk Score": 4,
-                "Detected At": "2026-04-08 11:33:10",
-            },
-            {
-                "Source URL": "https://twitter.com/MI_FanClub/status/1782049909009876543",
-                "Match Confidence": "85.7%",
-                "Gemini Classification": "🟢 Meme/Fan",
-                "Risk Score": 2,
-                "Detected At": "2026-04-08 11:27:44",
-            },
-        ],
-        columns=[
-            "Source URL",
-            "Match Confidence",
-            "Gemini Classification",
-            "Risk Score",
-            "Detected At",
-        ],
-    )
-
+    df = pd.DataFrame(DASHBOARD_FEED_ROWS)
     st.dataframe(df, use_container_width=True, hide_index=True)
+
+    st.subheader("Mock propagation — reshares over time (demo)")
+    prop_df = pd.DataFrame(PROPAGATION_ROWS)
+    fig = px.line(
+        prop_df,
+        x="Minutes since post",
+        y="Estimated reshares",
+        markers=True,
+        title="Estimated viral spread (mock)",
+    )
+    fig.update_layout(template="plotly_dark", margin=dict(l=20, r=20, t=50, b=20))
+    st.plotly_chart(fig, use_container_width=True)
+
 elif page == "Upload":
     st.header("📤 Register Official Content")
     st.info(
@@ -102,6 +93,7 @@ elif page == "Upload":
                 "status": "protected",
             }
         )
+
 elif page == "Detection Feed":
     st.header("🔍 Live Detection Feed")
 
@@ -117,58 +109,10 @@ elif page == "Detection Feed":
     )
 
     # TODO Phase 3: replace mock_data with api_client.run_scan()
-    data = [
-        {
-            "Source URL": "https://twitter.com/CricketIndia/status/1782050012345678901",
-            "Match %": 96.8,
-            "Classification": "Piracy",
-            "Risk Score": 10,
-            "Detected At": "2026-04-08 11:48:32",
-            "Action": "Take Down",
-        },
-        {
-            "Source URL": "https://t.me/ipl_fullmatch/1290",
-            "Match %": 94.1,
-            "Classification": "Piracy",
-            "Risk Score": 9,
-            "Detected At": "2026-04-08 11:45:10",
-            "Action": "Take Down",
-        },
-        {
-            "Source URL": "https://youtube.com/watch?v=Jk9LmN34OpQ",
-            "Match %": 89.5,
-            "Classification": "Transformative",
-            "Risk Score": 6,
-            "Detected At": "2026-04-08 11:39:02",
-            "Action": "Review",
-        },
-        {
-            "Source URL": "https://twitter.com/RCB_Analysis/status/1782049987654321098",
-            "Match %": 86.3,
-            "Classification": "Transformative",
-            "Risk Score": 5,
-            "Detected At": "2026-04-08 11:34:19",
-            "Action": "Review",
-        },
-        {
-            "Source URL": "https://youtube.com/shorts/Zx8pqR1TuVc",
-            "Match %": 83.9,
-            "Classification": "Meme",
-            "Risk Score": 3,
-            "Detected At": "2026-04-08 11:28:47",
-            "Action": "Ignore",
-        },
-        {
-            "Source URL": "https://twitter.com/MI_FanClub/status/1782049909009876543",
-            "Match %": 81.2,
-            "Classification": "Meme",
-            "Risk Score": 2,
-            "Detected At": "2026-04-08 11:23:05",
-            "Action": "Ignore",
-        },
-    ]
+    if "detection_rows" not in st.session_state:
+        st.session_state.detection_rows = [dict(r) for r in DETECTION_FEED_BASE_ROWS]
 
-    df_feed = pd.DataFrame(data)
+    df_feed = pd.DataFrame(st.session_state.detection_rows)
 
     if risk_filter == "🔴 High Risk":
         df_feed = df_feed[df_feed["Risk Score"] >= 8]
@@ -187,11 +131,36 @@ elif page == "Detection Feed":
     styled = df_feed.style.apply(highlight_risk, axis=1)
     st.dataframe(styled, use_container_width=True, hide_index=True)
 
-    if st.button("🔄 Refresh Scan", use_container_width=True):
-        st.toast("Scan triggered — checking 3 platforms...")
-else:
-    st.subheader(page)
-    st.info("Demo UI stub. This page will be implemented in the next steps.")
+    b1, b2 = st.columns(2)
+    with b1:
+        if st.button("🔄 Refresh Scan", use_container_width=True):
+            st.toast("Scan triggered — checking 3 platforms...")
+    with b2:
+        if st.button("Simulate Detection", use_container_width=True):
+            st.session_state.detection_rows.insert(0, dict(SIMULATED_PIRACY_ROW))
+            st.toast("New detection added — Gemini: Piracy (demo).")
+
+elif page == "DMCA Reports":
+    st.header("📄 DMCA Reports")
+    st.caption("Select a mock violation — notice text fills in for download (demo only).")
+
+    # TODO Phase 3: wire selected row to real detection IDs from the API
+    case_idx = st.selectbox(
+        "Violation",
+        range(len(DMCA_CASES)),
+        format_func=lambda i: DMCA_CASES[i]["label"],
+        index=0,
+    )
+    case = DMCA_CASES[case_idx]
+
+    body = build_dmca_notice(case)
+    st.text_area("Notice draft", value=body, height=320)
+    st.download_button(
+        label="⬇️ Download notice (.txt)",
+        data=body.encode("utf-8"),
+        file_name="sportsguard_dmca_notice_demo.txt",
+        mime="text/plain",
+        use_container_width=True,
+    )
 
 st.caption("SportsGuard AI — Google Solution Challenge 2026")
-
