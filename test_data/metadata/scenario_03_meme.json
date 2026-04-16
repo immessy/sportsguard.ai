@@ -1,12 +1,12 @@
 {
-  "post_id": "ig_78003",
+  "post_id": "ig_meme_78003",
   "platform": "Instagram",
   "user": "@cricket_memes_daily",
-  "text": "POV: Dhoni walks in at 160/5 \ud83d\ude24\ud83d\udd25 #ThalaForAReason #CSK #CricketMeme",
-  "source_url": "https://instagram.com/p/ig78003",
-  "timestamp": "2026-04-08T19:10:00Z",
+  "text": "POV: Dhoni walks in at 160/5 😤🔥 CSK fans right now #ThalaForAReason #CricketMeme",
+  "source_url": "https://instagram.com/p/CSKmeme78003",
+  "timestamp": "2026-04-15T19:10:29.543836+00:00",
   "video_file": "meme_clip.mp4",
   "scenario": "meme",
   "expected_classification": "Meme",
-  "expected_risk_score_max": 30
+  "expected_risk_score_max": 25
 }

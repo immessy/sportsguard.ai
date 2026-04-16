@@ -1,12 +1,12 @@
 {
-  "post_id": "tweet_90001",
-  "platform": "Twitter",
-  "user": "@full_match_free",
-  "text": "\ud83d\udd25 FULL IPL 2026 Final \u2014 MI vs CSK! Watch FREE in HD, no ads! Link in bio \ud83c\udfd0\ud83d\udcaf #IPL #FreeStream",
-  "source_url": "https://twitter.com/full_match_free/status/90001",
-  "timestamp": "2026-04-08T14:30:00Z",
+  "post_id": "tg_piracy_90001",
+  "platform": "Telegram",
+  "user": "@ipl_free_stream",
+  "text": "🔥 FULL IPL 2024 Final MI vs CSK — FREE HD stream no ads! Join channel for more matches",
+  "source_url": "https://t.me/ipl_free_stream/4821",
+  "timestamp": "2026-04-15T14:30:29.542606+00:00",
   "video_file": "piracy_clip.mp4",
   "scenario": "piracy",
   "expected_classification": "Piracy",
-  "expected_risk_score_min": 75
+  "expected_risk_score_min": 80
 }

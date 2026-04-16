@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SportsGuard AI — Database Setup (Module F)
+SportsGuard AI - Database Setup (Module F)
 Initializes the SQLite database schema with all required tables,
 indexes, and constraints for the SportsGuard content-protection pipeline.
 
@@ -127,7 +127,7 @@ def verify_integrity(conn: sqlite3.Connection) -> bool:
     """Run SQLite integrity check and return True if OK."""
     result = conn.execute("PRAGMA integrity_check;").fetchone()
     ok = result[0] == "ok"
-    status = "PASSED ✓" if ok else f"FAILED ✗ — {result[0]}"
+    status = "PASSED [OK]" if ok else f"FAILED [X] - {result[0]}"
     print(f"[setup] Integrity check: {status}")
     return ok
 
@@ -139,11 +139,11 @@ def seed_data(conn: sqlite3.Connection) -> None:
     # Official content
     conn.execute(
         "INSERT INTO official_content (title, uploaded_at, total_frames, file_path) VALUES (?, ?, ?, ?);",
-        ("IPL 2026 — MI vs CSK Highlights", now, 120, "uploads/ipl_mi_vs_csk.mp4"),
+        ("IPL 2026 - MI vs CSK Highlights", now, 120, "uploads/ipl_mi_vs_csk.mp4"),
     )
     conn.execute(
         "INSERT INTO official_content (title, uploaded_at, total_frames, file_path) VALUES (?, ?, ?, ?);",
-        ("Premier League — Arsenal vs Chelsea", now, 90, "uploads/pl_ars_vs_che.mp4"),
+        ("Premier League - Arsenal vs Chelsea", now, 90, "uploads/pl_ars_vs_che.mp4"),
     )
 
     # A handful of dummy fingerprints for video 1
@@ -207,7 +207,7 @@ def init_database(db_path: str = DEFAULT_DB_PATH, *, reset: bool = False, seed: 
         if seed:
             seed_data(conn)
 
-        print(f"[setup] Database ready → {Path(db_path).resolve()}")
+        print(f"[setup] Database ready -> {Path(db_path).resolve()}")
     finally:
         conn.close()
 
@@ -217,7 +217,7 @@ def init_database(db_path: str = DEFAULT_DB_PATH, *, reset: bool = False, seed: 
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="SportsGuard AI — Database Setup")
+    parser = argparse.ArgumentParser(description="SportsGuard AI - Database Setup")
     parser.add_argument("--reset", action="store_true", help="Drop and recreate all tables")
     parser.add_argument("--seed", action="store_true", help="Insert sample seed data (implies --reset)")
     parser.add_argument("--db", default=DEFAULT_DB_PATH, help=f"Database path (default: {DEFAULT_DB_PATH})")
