@@ -25,6 +25,7 @@ from branding import (
     inject_global_css,
     render_sidebar_logo,
     render_sidebar_status,
+    render_header_decoration,
     COLORS,
 )
 import dashboard_page
@@ -56,8 +57,9 @@ def init_session_state():
 
 init_session_state()
 
-# ── Inject global CSS ─────────────────────────────────────────────────────────
+# ── Inject global CSS & Patterns ──────────────────────────────────────────────
 inject_global_css()
+render_header_decoration()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -123,7 +125,7 @@ with st.sidebar:
     st.markdown(f"""
     <div style="padding: 0 16px 4px 16px;">
         <div style="font-size:9px;font-weight:700;letter-spacing:.1em;
-                    text-transform:uppercase;color:{COLORS['text_muted']};
+                    text-transform:uppercase;color:{COLORS['sidebar_text']};
                     margin-bottom:6px;">Mode</div>
     </div>
     """, unsafe_allow_html=True)

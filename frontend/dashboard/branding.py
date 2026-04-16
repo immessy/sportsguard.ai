@@ -25,7 +25,7 @@ COLORS = {
     # Sidebar
     "sidebar_bg":          "#2D1B69",
     "sidebar_border":      "#3D2A7D",
-    "sidebar_text":        "#C4B5FD",
+    "sidebar_text":        "#FFFFFF",
     "sidebar_active":      "#FFFFFF",
     "sidebar_hover_bg":    "rgba(167,139,250,0.15)",
     "sidebar_active_border":"#A78BFA",
@@ -110,36 +110,36 @@ def inject_global_css():
     }}
 
     /* ── Every nav label — always visible with text ── */
-    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {{
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label,
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label div,
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label p {{
         display: flex !important;
         align-items: center !important;
         visibility: visible !important;
         opacity: 1 !important;
+        color: {COLORS['sidebar_text']} !important;
+        transition: all 0.15s ease !important;
+        white-space: nowrap !important;
+    }}
+
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {{
         padding: 10px 16px !important;
         margin: 1px 8px !important;
         border-radius: 6px !important;
         border-left: 2px solid transparent !important;
         cursor: pointer !important;
-        font-size: 13px !important;
-        font-weight: 500 !important;
-        color: {COLORS['sidebar_text']} !important;
-        transition: all 0.15s ease !important;
-        white-space: nowrap !important;
-        overflow: visible !important;
-        text-overflow: unset !important;
     }}
 
-    /* Paragraph inside the label */
+    /* Force all text elements inside the label to inherit the white color */
+    [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label span,
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label p,
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label div p {{
-        display: block !important;
+        color: {COLORS['sidebar_text']} !important;
         visibility: visible !important;
         opacity: 1 !important;
-        color: inherit !important;
         font-size: 13px !important;
         font-weight: 500 !important;
         margin: 0 !important;
-        white-space: nowrap !important;
     }}
 
     /* Hover state */
@@ -462,10 +462,15 @@ def inject_global_css():
     [data-testid="stFileUploader"] section {{ border: none !important; background: transparent !important; }}
 
     /* ── Toggle — sidebar context ── */
-    [data-testid="stSidebar"] .stToggle > label span {{
+    [data-testid="stSidebar"] .stToggle > label,
+    [data-testid="stSidebar"] .stToggle > label div,
+    [data-testid="stSidebar"] .stToggle > label span,
+    [data-testid="stSidebar"] .stToggle > label p {{
         font-size: 12px !important;
         color: {COLORS['sidebar_text']} !important;
         font-weight: 500 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
     }}
 
     /* ── Divider ── */
@@ -609,6 +614,36 @@ def inject_global_css():
     .sg-view-all:hover {{ color: {COLORS['accent_hover']}; }}
     /* ── Breadcrumb ── */
     .sg-breadcrumb {{ font-size: 11px; color: {COLORS['text_muted']}; margin-bottom: 4px; }}
+
+    /* ── Header Pattern Decoration ── */
+    .sg-header-pattern {{
+        position: fixed;
+        top: 0;
+        left: 240px; /* Respect sidebar */
+        right: 0;
+        height: 320px;
+        background: 
+            linear-gradient(
+                to bottom,
+                {COLORS['bg_primary']} 0%,
+                {COLORS['bg_primary']} 25%,
+                rgba(240, 242, 255, 0) 100%
+            ),
+            linear-gradient(to right, #10B981, {COLORS['accent']});
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+        opacity: 0.25; /* Subtle blend */
+    }}
+    .sg-header-pattern::before {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(90deg, rgba(124, 58, 237, 0.15) 1px, transparent 1px);
+        background-size: 60px 100%;
+        mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 80%);
+        -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 80%);
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -716,3 +751,8 @@ def page_header(title, subtitle=None, breadcrumb=None, show_active=True):
         {"<span class='sg-status-live'>● ACTIVE MONITORING</span>" if show_active else ""}
     </div>
     """, unsafe_allow_html=True)
+
+
+def render_header_decoration():
+    """Renders the fixed background pattern decorative div."""
+    st.markdown('<div class="sg-header-pattern"></div>', unsafe_allow_html=True)
