@@ -126,7 +126,7 @@ with st.sidebar:
     <div style="padding: 0 16px 4px 16px;">
         <div style="font-size:9px;font-weight:700;letter-spacing:.1em;
                     text-transform:uppercase;color:{COLORS['sidebar_text']};
-                    margin-bottom:6px;">Mode</div>
+                    margin-bottom:6px; font-family: 'Syne', sans-serif;">Mode</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -174,27 +174,26 @@ with st.sidebar:
             <div style="width:6px;height:6px;background:{dot_color};
                         border-radius:50%;animation:pulse-dot 1.5s infinite;"></div>
             <span style="font-size:10px;font-weight:700;letter-spacing:.1em;
-                         text-transform:uppercase;color:{dot_color};">
+                         text-transform:uppercase;color:{dot_color}; font-family: 'Syne', sans-serif;">
                 {mode_label}
             </span>
         </div>
-        <div style="font-size:10px;color:{COLORS['text_muted']};line-height:1.5;">
+        <div style="font-size:10px;color:{COLORS['sidebar_text']};line-height:1.5; opacity: 1;">
             {mode_text}
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Debug panel (only visible when Demo Mode is OFF) ─────────────────────
     if not demo_mode:
         st.markdown(f"""
         <div style="padding: 0 16px 8px 16px;">
-            <div style="font-size:10px;color:{COLORS['text_muted']};">
+            <div style="font-size:10px;color:{COLORS['sidebar_text']}; opacity: 1;">
                 Flask:
                 <span style="color:{'#22C55E' if is_live else '#EF4444'};">
                     {'✅ Connected' if is_live else '❌ Offline'}
                 </span>
             </div>
-            <div style="font-size:10px;color:{COLORS['text_muted']};margin-top:2px;">
+            <div style="font-size:10px;color:{COLORS['sidebar_text']};margin-top:2px; opacity: 1;">
                 MOCK_MODE:
                 <span style="font-family:'JetBrains Mono',monospace;color:{COLORS['accent']};">
                     {api_client.MOCK_MODE}

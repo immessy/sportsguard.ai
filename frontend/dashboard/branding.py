@@ -35,19 +35,35 @@ COLORS = {
 def inject_global_css():
     st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
     /* ── Reset & Base ── */
     html, body, [class*="css"] {{
-        font-family: 'Inter', sans-serif !important;
+        font-family: 'Outfit', sans-serif !important;
         background-color: {COLORS['bg_primary']} !important;
         color: {COLORS['text_primary']} !important;
     }}
+    /* ── Full-Page Uiverse Background (Native Injection) ── */
     .stApp {{
         background-color: {COLORS['bg_primary']} !important;
-        background-image:
-            radial-gradient(ellipse at 20% 0%,   rgba(124,58,237,0.08) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.06) 0%, transparent 50%);
+        background-image: 
+            linear-gradient(to bottom, rgba(30, 27, 75, 0.2) 0%, transparent 50%, rgba(124, 58, 237, 0.08) 100%),
+            linear-gradient(to right, rgba(14, 210, 218, 0.18), rgba(95, 41, 199, 0.18)) !important;
+        background-attachment: fixed !important;
+    }}
+
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 240px;
+        right: 0;
+        bottom: 0;
+        background-image: linear-gradient(90deg, rgba(124, 58, 237, 0.1) 1px, transparent 1px);
+        background-size: 50px 100%;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.9;
     }}
 
     /* ── Hide Streamlit chrome ── */
@@ -180,14 +196,18 @@ def inject_global_css():
     [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label > div:first-child {{
         display: none !important;
     }}
-    /* ════════════════════════════════════════════════════
-       END SIDEBAR
-    ════════════════════════════════════════════════════ */
 
     /* ── Main content padding ── */
     .main .block-container {{
         padding: 1.5rem 2rem 2rem 2rem !important;
         max-width: 100% !important;
+    }}
+
+    h1, h2, h3 {{ 
+        font-family: 'Syne', sans-serif; 
+        font-weight: 800; 
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
     }}
 
     /* ── Metric cards ── */
@@ -224,7 +244,7 @@ def inject_global_css():
         margin-bottom: 8px;
     }}
     .sg-metric-value {{
-        font-family: 'Rajdhani', sans-serif;
+        font-family: 'Space Grotesk', sans-serif;
         font-size: 42px;
         font-weight: 700;
         color: {COLORS['text_primary']};
@@ -258,7 +278,7 @@ def inject_global_css():
         margin-bottom: 12px;
     }}
     .sg-section-title {{
-        font-family: 'Rajdhani', sans-serif;
+        font-family: 'Syne', sans-serif;
         font-size: 13px;
         font-weight: 700;
         letter-spacing: 0.15em;
@@ -340,9 +360,9 @@ def inject_global_css():
         overflow: hidden;
         text-overflow: ellipsis;
     }}
-    .sg-table .conf-high {{ color: {COLORS['danger']};  font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 14px; }}
-    .sg-table .conf-med  {{ color: {COLORS['medium']}; font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 14px; }}
-    .sg-table .conf-low  {{ color: {COLORS['success']}; font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 14px; }}
+    .sg-table .conf-high {{ color: {COLORS['danger']};  font-weight: 700; font-family: 'Space Grotesk', sans-serif; font-size: 14px; }}
+    .sg-table .conf-med  {{ color: {COLORS['medium']}; font-weight: 700; font-family: 'Inter', sans-serif; font-size: 14px; }}
+    .sg-table .conf-low  {{ color: {COLORS['success']}; font-weight: 700; font-family: 'Space Grotesk', sans-serif; font-size: 14px; }}
 
     /* ── Table action buttons ── */
     .btn-takedown {{
@@ -367,7 +387,7 @@ def inject_global_css():
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 8px !important;
-        font-family: 'Rajdhani', sans-serif !important;
+        font-family: 'Syne', sans-serif !important;
         font-weight: 700 !important;
         font-size: 15px !important;
         letter-spacing: 0.06em !important;
@@ -382,45 +402,6 @@ def inject_global_css():
         transform: translateY(-1px) !important;
         box-shadow: 0 4px 20px rgba(124,58,237,0.4) !important;
     }}
-    .stButton > button:active {{
-        transform: translateY(0px) !important;
-    }}
-
-    /* ── Log panel ── */
-    .sg-log-panel {{
-        background: {COLORS['bg_tertiary']};
-        border: 1px solid {COLORS['border']};
-        border-radius: 8px;
-        padding: 16px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
-        line-height: 1.7;
-        max-height: 160px;
-        overflow-y: auto;
-    }}
-    .log-alert   {{ color: {COLORS['danger']};         }}
-    .log-info    {{ color: {COLORS['text_secondary']}; }}
-    .log-success {{ color: {COLORS['success']};        }}
-    .log-ts      {{ color: {COLORS['accent']}; margin-right: 6px; }}
-
-    /* ── Code / JSON block ── */
-    .sg-code-block {{
-        background: {COLORS['bg_tertiary']};
-        border: 1px solid {COLORS['border']};
-        border-left: 3px solid {COLORS['accent']};
-        border-radius: 6px;
-        padding: 16px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
-        line-height: 1.7;
-        color: {COLORS['text_secondary']};
-        white-space: pre;
-        overflow-x: auto;
-    }}
-    .json-key  {{ color: {COLORS['accent']};  }}
-    .json-str  {{ color: {COLORS['success']}; }}
-    .json-num  {{ color: #2563EB;             }}
-    .json-bool {{ color: #DB2777;             }}
 
     /* ── Inputs ── */
     .stTextInput > div > div > input {{
@@ -430,10 +411,6 @@ def inject_global_css():
         color: {COLORS['text_primary']} !important;
         font-size: 13px !important;
     }}
-    .stTextInput > div > div > input:focus {{
-        border-color: {COLORS['accent']} !important;
-        box-shadow: 0 0 0 3px rgba(124,58,237,0.12) !important;
-    }}
     .stTextInput label, .stSelectbox label {{
         font-size: 10px !important;
         font-weight: 700 !important;
@@ -442,43 +419,25 @@ def inject_global_css():
         color: {COLORS['text_muted']} !important;
     }}
 
-    /* ── Selectbox ── */
-    .stSelectbox > div > div,
-    .stSelectbox > div > div > div {{
-        background: {COLORS['bg_tertiary']} !important;
-        border-color: {COLORS['border']} !important;
-        color: {COLORS['text_primary']} !important;
-        border-radius: 8px !important;
-    }}
-
-    /* ── File uploader ── */
-    [data-testid="stFileUploader"] {{
-        background: {COLORS['bg_tertiary']};
-        border: 1.5px dashed rgba(124,58,237,0.3);
-        border-radius: 10px;
-        padding: 8px;
-    }}
-    [data-testid="stFileUploader"]:hover {{ border-color: {COLORS['accent']}; }}
-    [data-testid="stFileUploader"] section {{ border: none !important; background: transparent !important; }}
-
-    /* ── Toggle — sidebar context ── */
-    [data-testid="stSidebar"] .stToggle > label,
-    [data-testid="stSidebar"] .stToggle > label div,
-    [data-testid="stSidebar"] .stToggle > label span,
-    [data-testid="stSidebar"] .stToggle > label p {{
-        font-size: 12px !important;
-        color: {COLORS['sidebar_text']} !important;
-        font-weight: 500 !important;
+    /* ── Sidebar Text Overrides ── */
+    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
+    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] span,
+    [data-testid="stSidebar"] .st-emotion-cache-121p6b1,
+    [data-testid="stSidebar"] .st-emotion-cache-6q9sum,
+    [data-testid="stSidebar"] .st-emotion-cache-162961b,
+    [data-testid="stSidebar"] .st-emotion-cache-ocq96v,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span {{
+        color: #FFFFFF !important;
         opacity: 1 !important;
-        visibility: visible !important;
+        font-family: 'Outfit', sans-serif !important;
+        -webkit-text-fill-color: #FFFFFF !important;
     }}
-
-    /* ── Divider ── */
-    hr {{ border-color: {COLORS['border']} !important; margin: 16px 0 !important; }}
 
     /* ── Page title ── */
     .sg-page-title {{
-        font-family: 'Rajdhani', sans-serif;
+        font-family: 'Syne', sans-serif;
         font-size: 32px;
         font-weight: 700;
         color: {COLORS['text_primary']};
@@ -486,194 +445,90 @@ def inject_global_css():
         line-height: 1.1;
         margin-bottom: 2px;
     }}
-    .sg-page-subtitle {{
-        font-size: 12px;
-        color: {COLORS['text_secondary']};
-        letter-spacing: 0.04em;
-        margin-bottom: 24px;
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar       {{ width: 6px; height: 6px; }}
+    ::-webkit-scrollbar-track {{ background: {COLORS['bg_primary']}; }}
+    ::-webkit-scrollbar-thumb {{ background: {COLORS['accent']}; border-radius: 3px; }}
+
+    /* ── Breadcrumb ── */
+    .sg-breadcrumb {{ font-size: 11px; color: {COLORS['text_muted']}; margin-bottom: 4px; }}
+
+    /* ── Content Type & DMCA Components ── */
+    .sg-feature-card {{
+        background: #FFFFFF;
+        border: 1px solid {COLORS['border']};
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }}
+    .sg-feature-title {{
+        font-family: 'Syne', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: {COLORS['text_primary']};
+        margin-bottom: 4px;
         display: flex;
         align-items: center;
         gap: 8px;
     }}
-    .sg-status-live {{
-        color: {COLORS['accent']};
+    .sg-feature-subtitle {{
+        font-size: 12px;
+        color: {COLORS['text_secondary']};
+        margin-bottom: 20px;
+    }}
+    .sg-ct-badge {{
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 11px;
         font-weight: 700;
-        font-size: 10px;
-        letter-spacing: 0.12em;
         text-transform: uppercase;
-        padding: 2px 8px;
-        background: {COLORS['accent_dim']};
-        border-radius: 3px;
-        border: 1px solid rgba(124,58,237,0.25);
+        letter-spacing: 0.05em;
     }}
+    .ct-raw      {{ background: #FEE2E2; color: #EF4444; border: 1px solid #FECACA; }}
+    .ct-meme     {{ background: #D1FAE5; color: #10B981; border: 1px solid #A7F3D0; }}
+    .ct-analysis {{ background: #DBEAFE; color: #3B82F6; border: 1px solid #BFDBFE; }}
+    .ct-reaction {{ background: #FEF3C7; color: #F59E0B; border: 1px solid #FDE68A; }}
 
-    /* ── Banners ── */
-    .sg-banner-warning {{
-        background: {COLORS['warning_dim']};
-        border: 1px solid rgba(245,158,11,0.3);
-        border-left: 3px solid {COLORS['warning']};
-        border-radius: 6px; padding: 12px 16px;
-        font-size: 12px; color: {COLORS['text_secondary']};
-        margin-bottom: 16px;
-        display: flex; align-items: flex-start; gap: 10px;
-    }}
-    .sg-banner-success {{
-        background: {COLORS['success_dim']};
-        border: 1px solid rgba(16,185,129,0.3);
-        border-left: 3px solid {COLORS['success']};
-        border-radius: 6px; padding: 12px 16px;
-        font-size: 12px; color: #065F46;
-        margin-bottom: 16px;
-        display: flex; align-items: center; gap: 10px; font-weight: 500;
-    }}
-    .sg-banner-info {{
-        background: {COLORS['accent_dim']};
-        border: 1px solid rgba(124,58,237,0.2);
-        border-left: 3px solid {COLORS['accent']};
-        border-radius: 6px; padding: 12px 16px;
-        font-size: 12px; color: {COLORS['accent']};
-        margin-bottom: 16px;
-    }}
-
-    /* ── DMCA notice ── */
-    .sg-dmca-notice {{
-        background: {COLORS['bg_tertiary']};
-        border: 1px solid {COLORS['border']};
-        border-radius: 8px; padding: 20px;
-        font-size: 12px; color: {COLORS['text_secondary']};
-        line-height: 1.8;
+    .sg-dmca-preview {{
+        background: #F8FAFC;
+        color: #475569;
+        padding: 16px;
+        border-radius: 8px;
         font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        line-height: 1.6;
+        height: 160px;
+        overflow-y: auto;
+        border: 1px solid #E2E8F0;
+        margin: 16px 0;
         white-space: pre-wrap;
     }}
-    .dmca-label {{ color: {COLORS['accent']};       font-weight: 600; }}
-    .dmca-value {{ color: {COLORS['text_primary']}; }}
+    .sg-dmca-detail-row {{
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #F1F5F9;
+        font-size: 12px;
+    }}
+    .sg-dmca-detail-label {{ color: {COLORS['text_muted']}; font-weight: 500; }}
+    .sg-dmca-detail-value {{ color: {COLORS['text_primary']}; font-weight: 600; font-family: 'Space Grotesk', sans-serif; }}
 
-    /* ── Violation cards ── */
-    .sg-violation-card {{
-        background: {COLORS['bg_tertiary']};
-        border: 1px solid {COLORS['border']};
-        border-radius: 8px; padding: 14px 16px; margin-bottom: 8px;
-        cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
-    }}
-    .sg-violation-card:hover {{
-        border-color: {COLORS['accent']};
-        box-shadow: 0 2px 12px rgba(124,58,237,0.1);
-    }}
-    .sg-violation-card.active {{
-        border-color: {COLORS['accent']};
-        background: {COLORS['accent_dim']};
-    }}
-    .sg-violation-id {{
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px; color: {COLORS['accent']};
-        margin-bottom: 4px; font-weight: 600;
-    }}
-    .sg-violation-title {{
-        font-size: 13px; font-weight: 600;
-        color: {COLORS['text_primary']}; margin-bottom: 4px;
-    }}
-    .sg-violation-url {{
-        font-size: 10px; color: {COLORS['text_muted']};
-        font-family: 'JetBrains Mono', monospace;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }}
-
-    /* ── System integrity panel ── */
-    .sg-integrity-panel {{
-        background: {COLORS['bg_secondary']};
-        border: 1px solid {COLORS['border']};
-        border-radius: 12px; padding: 20px; text-align: center;
-        box-shadow: 0 2px 10px rgba(124,58,237,0.05);
-    }}
-    .sg-integrity-icon  {{ font-size: 40px; margin-bottom: 10px; }}
-    .sg-integrity-title {{
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 14px; font-weight: 700;
-        letter-spacing: 0.1em; text-transform: uppercase;
-        color: {COLORS['text_primary']}; margin-bottom: 8px;
-    }}
-    .sg-integrity-text {{ font-size: 11px; color: {COLORS['text_muted']}; line-height: 1.6; }}
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar       {{ width: 4px; height: 4px; }}
-    ::-webkit-scrollbar-track {{ background: {COLORS['bg_tertiary']}; }}
-    ::-webkit-scrollbar-thumb {{ background: #DDD6FE; border-radius: 2px; }}
-    ::-webkit-scrollbar-thumb:hover {{ background: {COLORS['accent']}; }}
-
-    /* ── Column gaps ── */
-    [data-testid="column"] {{ padding: 0 6px !important; }}
-    [data-testid="column"]:first-child {{ padding-left: 0 !important; }}
-    [data-testid="column"]:last-child  {{ padding-right: 0 !important; }}
-
-    /* ── View all link ── */
-    .sg-view-all {{
-        font-size: 11px; color: {COLORS['accent']};
-        font-weight: 600; letter-spacing: 0.06em;
-        text-transform: uppercase; cursor: pointer; margin-left: auto;
-    }}
-    .sg-view-all:hover {{ color: {COLORS['accent_hover']}; }}
-    /* ── Breadcrumb ── */
-    .sg-breadcrumb {{ font-size: 11px; color: {COLORS['text_muted']}; margin-bottom: 4px; }}
-
-    /* ── Header Pattern Decoration ── */
-    .sg-header-pattern {{
-        position: fixed;
-        top: 0;
-        left: 240px; /* Respect sidebar */
-        right: 0;
-        height: 320px;
-        background: 
-            linear-gradient(
-                to bottom,
-                {COLORS['bg_primary']} 0%,
-                {COLORS['bg_primary']} 25%,
-                rgba(240, 242, 255, 0) 100%
-            ),
-            linear-gradient(to right, #10B981, {COLORS['accent']});
-        z-index: 0;
-        overflow: hidden;
-        pointer-events: none;
-        opacity: 0.25; /* Subtle blend */
-    }}
-    .sg-header-pattern::before {{
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image: linear-gradient(90deg, rgba(124, 58, 237, 0.15) 1px, transparent 1px);
-        background-size: 60px 100%;
-        mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 80%);
-        -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 80%);
-    }}
+    /* (Note: Pattern logic moved to .stApp for reliability) */
     </style>
     """, unsafe_allow_html=True)
 
 
-# ─── Sidebar Components ───────────────────────────────────────────────────────
 def render_sidebar_logo():
     st.markdown(f"""
-    <div style="
-        padding: 20px 16px 16px 16px;
-        border-bottom: 1px solid {COLORS['sidebar_border']};
-        margin-bottom: 8px;
-    ">
+    <div style="padding: 20px 16px 16px 16px; border-bottom: 1px solid {COLORS['sidebar_border']}; margin-bottom: 8px;">
         <div style="display:flex; align-items:center; gap:10px;">
-            <div style="
-                width:32px; height:32px;
-                background: linear-gradient(135deg, #7C3AED, #A78BFA);
-                border-radius:8px;
-                display:flex; align-items:center; justify-content:center;
-                font-size:16px; color:#FFFFFF; font-weight:900; flex-shrink:0;
-            ">🛡</div>
+            <div style="width:32px; height:32px; background: linear-gradient(135deg, #7C3AED, #A78BFA); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#FFFFFF; font-weight:900;">🛡</div>
             <div>
-                <div style="
-                    font-family:'Rajdhani',sans-serif;
-                    font-size:16px; font-weight:700;
-                    color:#FFFFFF; letter-spacing:0.05em; line-height:1.1;
-                ">SportsGuard AI</div>
-                <div style="
-                    font-size:9px; color:{COLORS['sidebar_text']};
-                    letter-spacing:0.12em; text-transform:uppercase;
-                ">Tactical Hub</div>
+                <div style="font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:#FFFFFF; letter-spacing:0.05em;">SportsGuard AI</div>
+                <div style="font-size:9px; color:{COLORS['sidebar_text']}; letter-spacing:0.12em; text-transform:uppercase;">Tactical Hub</div>
             </div>
         </div>
     </div>
@@ -684,26 +539,15 @@ def render_sidebar_status(backend_live=False, demo_mode=True):
     status_color = COLORS['success'] if backend_live else COLORS['danger']
     status_text  = "Backend Live"    if backend_live else "Backend Offline"
     st.markdown(f"""
-    <div style="
-        padding: 12px 16px;
-        border-top: 1px solid {COLORS['sidebar_border']};
-        margin-top: 8px;
-    ">
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-            <div style="
-                width:7px; height:7px;
-                background:{status_color}; border-radius:50%;
-                animation:pulse-dot 2s infinite;
-            "></div>
-            <span style="font-size:11px; color:{COLORS['sidebar_text']}; font-weight:500;">
-                {status_text}
-            </span>
+    <div style="padding: 12px 16px; border-top: 1px solid {COLORS['sidebar_border']}; margin-top: 8px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+            <div style="width:7px; height:7px; background:{status_color}; border-radius:50%; animation:pulse-dot 2s infinite;"></div>
+            <span style="font-size:11px; color:{COLORS['sidebar_text']}; font-weight:500;">{status_text}</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 
-# ─── Reusable UI Components ───────────────────────────────────────────────────
 def metric_card(label, value, delta, delta_type="up", icon="📊"):
     arrow = "↑" if delta_type in ("up", "good") else "↓"
     st.markdown(f"""
@@ -720,7 +564,7 @@ def section_header(title, live=False, view_all=False):
     live_dot  = '<div class="sg-live-dot"></div>' if live else ""
     view_link = '<span class="sg-view-all">VIEW ALL →</span>' if view_all else ""
     st.markdown(f"""
-    <div class="sg-section-header" style="display:flex;align-items:center;width:100%;">
+    <div class="sg-section-header" style="display:flex;align-items:center;">
         {live_dot}
         <span class="sg-section-title">{title}</span>
         {view_link}

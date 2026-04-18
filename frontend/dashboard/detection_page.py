@@ -10,6 +10,7 @@
 
 import streamlit as st
 from branding import COLORS, page_header, risk_badge
+from ui_components import render_content_type, render_dmca_smart_panel
 
 STATUS_DOT_COLORS = {
     "danger":  "#EF4444",
@@ -194,9 +195,28 @@ def render():
         data = [d for d in data if d["risk"] == "LOW"]
 
     # ── Table ─────────────────────────────────────────────────────────────────
-    st.markdown('<div class="sg-panel" style="padding:0;overflow:hidden;">', unsafe_allow_html=True)
-    render_detection_table(data)
-    st.markdown("</div>", unsafe_allow_html=True)
+    main_col, side_col = st.columns([2.5, 1])
+    
+    with main_col:
+        st.markdown('<div class="sg-panel" style="padding:0;overflow:hidden;">', unsafe_allow_html=True)
+        render_detection_table(data)
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    with side_col:
+        st.markdown(f'<div style="font-family:Syne,sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:{COLORS["text_secondary"]};margin-bottom:12px;">Intelligence Insights</div>', unsafe_allow_html=True)
+        
+        # Placeholder data from user contract
+        insight_data = {
+            "content_type": "Meme",
+            "confidence": 92,
+            "risk_level": "High",
+            "platform": "YouTube",
+            "timestamp": "02:13",
+            "match_percent": 87
+        }
+        
+        render_content_type(insight_data)
+        render_dmca_smart_panel(insight_data)
 
     st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
