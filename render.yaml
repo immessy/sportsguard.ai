@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: sportsguard-api
+    runtime: python
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: REDDIT_SUBREDDIT
+        value: sports
+      - key: HASH_DISTANCE_THRESHOLD
+        value: "10"

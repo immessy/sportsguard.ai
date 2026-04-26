@@ -1,0 +1,11 @@
+{
+    "post_id": "PRC-9910",
+    "user": "stream_pirate",
+    "platform": "Twitter",
+    "text": "Streaming IPL LIVE right now — DM for link before it goes down #FreeStream #IPL2024",
+    "video_file": "piracy_clip.mp4",
+    "classification": "Piracy",
+    "risk_score": 96,
+    "reasoning": "Explicit live stream promotion with direct messaging solicitation for illegal access links. Raw broadcast footage detected.",
+    "source_url": "https://twitter.com/stream_pirate/status/19103"
+}
