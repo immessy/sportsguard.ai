@@ -1,248 +1,331 @@
-# SportsGuard AI MVP
+# SportsGuard AI
 
-SportsGuard AI is a working end-to-end prototype for detecting likely sports piracy using:
+> **Automated sports piracy detection and DMCA enforcement — powered by computer vision and Gemini AI.**
 
-- Next.js + Tailwind frontend
-- FastAPI backend
-- Supabase PostgreSQL
-- OpenCV + ImageHash
-- Gemini 2.5 Flash
-- Reddit `.json` scraping without PRAW or Reddit API keys
+SportsGuard AI is a full-stack prototype that fingerprints official broadcast clips, continuously scans Reddit for visual matches, classifies each hit using Gemini 2.5 Flash, and surfaces one-click DMCA takedown notices inside a clean enforcement console.
 
-## Architecture
+---
 
-1. A rights holder uploads an official `.mp4` through the Next.js dashboard.
-2. FastAPI streams the upload to a temp file, extracts 3 evenly spaced frames, computes `pHash` values, and stores them in Supabase `official_assets`.
-3. The operator triggers a live scan.
-4. FastAPI runs `scrape_and_check()` in a `BackgroundTask`.
-5. The scraper fetches `https://www.reddit.com/r/<subreddit>/new.json?limit=10` with a desktop `User-Agent`.
-6. The scraper downloads only preview images or thumbnails, never full Reddit videos.
-7. Each preview image is hashed and compared against stored official hashes by Hamming distance.
-8. If the best match is below the configured threshold, the Reddit title is sent to Gemini for classification: `Piracy`, `Meme`, or `Transformative`.
-9. The final result is written to Supabase `detections`.
-10. The Next.js dashboard polls the backend every 5 seconds and renders the latest 20 detections.
+## How It Works
+
+```
+Rights Holder Uploads .mp4
+         │
+         ▼
+  FastAPI streams file in 1 MB chunks
+  OpenCV extracts 3 evenly-spaced frames
+  ImageHash computes a pHash per frame
+  Hashes stored in Supabase (official_assets)
+         │
+         ▼
+  Operator triggers Live Scan
+         │
+         ▼
+  Scraper fetches Reddit /r/<subreddit>/hot.json
+  (no API key — public JSON endpoint, desktop UA)
+         │
+         ▼
+  For each post: download thumbnail / preview image
+  Compute pHash → Hamming distance vs stored hashes
+  If distance < threshold (default 10):
+         │
+         ▼
+  Gemini 2.5 Flash classifies post title
+  → "Piracy" | "Meme" | "Transformative"
+  → confidence score + 1-5 word reasoning
+         │
+         ▼
+  Detection written to Supabase (detections)
+         │
+         ▼
+  Next.js dashboard polls every 5 s
+  Renders Threat Feed with risk scores + DMCA button
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 15, TypeScript, Tailwind CSS |
+| Backend | FastAPI, Python 3.12+ |
+| Database | Supabase (PostgreSQL) |
+| Computer Vision | OpenCV (`opencv-python-headless`), ImageHash (`pHash`) |
+| AI Classification | Google Gemini 2.5 Flash (`google-genai`) |
+| Hosting (backend) | Render · Railway |
+| Hosting (frontend) | Vercel |
+
+---
 
 ## Project Structure
 
-```text
-backend/
-  database.py
-  gemini_agent.py
-  main.py
-  scraper.py
-  vision.py
-frontend/
-  package.json
-  src/app/layout.tsx
-  src/app/page.tsx
-supabase/
-  schema.sql
-requirements.txt
-render.yaml
-railway.json
+```
+sportsguard.ai/
+├── backend/
+│   ├── main.py           # FastAPI app — all API routes
+│   ├── vision.py         # OpenCV frame extraction + pHash logic
+│   ├── scraper.py        # Reddit scraper + matching pipeline
+│   ├── gemini_agent.py   # Gemini 2.5 Flash classification
+│   ├── database.py       # Supabase client (singleton, lru_cache)
+│   └── state.py          # In-memory scan status shared state
+├── frontend/
+│   └── src/app/
+│       ├── page.tsx       # Enforcement console UI
+│       └── layout.tsx     # Root layout + global styles
+├── supabase/
+│   └── schema.sql         # Table definitions + indexes
+├── scripts/
+│   └── api_smoke_test.py  # End-to-end API test script
+├── test_data/             # Sample .mp4 clips for local testing
+├── .env.example           # Environment variable template
+├── requirements.txt       # Python dependencies
+├── render.yaml            # Render deployment config
+└── railway.json           # Railway deployment config
 ```
 
-## Environment Variables
+---
 
-Copy [.env.example](C:/Users/abhin/sportsguard.ai%20-%20Copy/.env.example) to `.env` for the backend and set:
+## Quickstart
+
+### 1. Prerequisites
+
+- Python 3.12 or later
+- Node.js 18 or later
+- A [Supabase](https://supabase.com) project (free tier works)
+- A [Google AI Studio](https://aistudio.google.com) API key
+
+### 2. Clone & Configure
+
+```bash
+git clone https://github.com/immessy/sportsguard.ai.git
+cd sportsguard.ai
+cp .env.example .env
+```
+
+Edit `.env`:
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-supabase-service-role-or-secret-key
+SUPABASE_KEY=your-supabase-service-role-key
 GEMINI_API_KEY=your-gemini-api-key
+
+# Optional — defaults shown
 REDDIT_SUBREDDIT=sports
 HASH_DISTANCE_THRESHOLD=10
-CORS_ORIGINS=http://localhost:3000,https://your-vercel-app.vercel.app
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+CORS_ORIGINS=http://localhost:3000
 ```
 
-For the frontend, copy [frontend/.env.local.example](C:/Users/abhin/sportsguard.ai%20-%20Copy/frontend/.env.local.example) to `frontend/.env.local`:
+### 3. Set Up the Database
 
-```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-```
+1. Open your Supabase project → **SQL Editor**
+2. Paste and run the contents of [`supabase/schema.sql`](supabase/schema.sql)
 
-## Supabase Setup
+This creates two tables:
 
-1. Create a Supabase project.
-2. Open the SQL editor.
-3. Run [supabase/schema.sql](C:/Users/abhin/sportsguard.ai%20-%20Copy/supabase/schema.sql).
-4. Copy the project URL and service-role key into your backend `.env`.
+| Table | Purpose |
+|---|---|
+| `official_assets` | Stores filename + 3 pHash values per uploaded clip |
+| `detections` | Stores every Reddit post that matched, with classification + risk score |
 
-The schema creates:
-
-- `official_assets`
-- `detections`
-
-## Local Development
-
-### Backend
+### 4. Run the Backend
 
 ```bash
+# Create and activate a virtual environment (recommended)
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate        # Windows
+source .venv/bin/activate     # macOS / Linux
+
 pip install -r requirements.txt
+
 uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Backend endpoints:
+Backend is now live at `http://localhost:8000`.
 
-- `GET /api/health`
-- `POST /api/upload`
-- `POST /api/start-scan`
-- `GET /api/detections`
-
-### Frontend
+### 5. Run the Frontend
 
 ```bash
 cd frontend
+cp .env.local.example .env.local   # sets NEXT_PUBLIC_API_BASE_URL
+
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000` — you should see the Enforcement Console with a green **Live** indicator.
 
-## Smoke Test Script
+---
 
-Use [scripts/api_smoke_test.py](C:/Users/abhin/sportsguard.ai%20-%20Copy/scripts/api_smoke_test.py) to exercise the live backend with a real upload and scan trigger:
+## Using the Dashboard
+
+| Step | Action |
+|---|---|
+| **1. Upload** | Click **Upload MP4** and select an official broadcast clip (`.mp4`). The backend hashes it and stores 3 pHash fingerprints. |
+| **2. Scan** | Click **Start Scan**. FastAPI runs the Reddit scraper in a background task and polls for status every 2 seconds. |
+| **3. Review** | The **Threat Feed** table populates with detections — each showing the Reddit URL, classification badge, risk score, and AI reasoning. |
+| **4. Enforce** | For any `Piracy` detection, click **Issue DMCA** to generate a fully formatted DMCA takedown notice. Copy it to your clipboard and send it to the platform's copyright agent. |
+| **5. Clear** | Click **Clear Feed** to reset the detections table for the next session. |
+
+### Classification & Risk Scores
+
+| Classification | Risk Score | Meaning |
+|---|---|---|
+| 🔴 **Piracy** | 85–100 | Unauthorised repost or live stream — issue DMCA immediately |
+| 🟡 **Meme** | 35 | Humour / banter — may still infringe, manual review recommended |
+| 🟢 **Transformative** | 0–15 | Commentary, analysis, or fan art — likely fair use |
+
+---
+
+## API Reference
+
+All endpoints are served from `http://localhost:8000`.
+
+### `GET /api/health`
+Returns `{"status": "ok"}`. Used by the frontend for the live/down indicator.
+
+### `POST /api/upload`
+Upload an official `.mp4` file. Accepts `multipart/form-data`.
 
 ```bash
-python scripts/api_smoke_test.py --base-url http://localhost:8000 --video test_data/videos/official_match.mp4
-```
-
-What it does:
-
-- checks `GET /api/health`
-- uploads a real `.mp4` through `POST /api/upload`
-- triggers the live Reddit scan through `POST /api/start-scan`
-- polls `GET /api/detections`
-
-## Sample API Commands
-
-### Health Check
-
-```bash
-curl http://localhost:8000/api/health
-```
-
-### Upload Official Video
-
-```bash
-curl -X POST "http://localhost:8000/api/upload" ^
-  -H "accept: application/json" ^
-  -H "Content-Type: multipart/form-data" ^
+curl -X POST http://localhost:8000/api/upload \
   -F "file=@test_data/videos/official_match.mp4;type=video/mp4"
 ```
 
-### Trigger Live Scan
+**Response:**
+```json
+{
+  "message": "Official asset uploaded and hashed successfully.",
+  "filename": "official_match.mp4",
+  "hashes": ["a1b2c3d4e5f6...", "..."],
+  "record": { "id": "uuid", "filename": "...", "hashes": [...] }
+}
+```
+
+### `POST /api/start-scan`
+Triggers the Reddit scraper as a FastAPI `BackgroundTask`.
 
 ```bash
 curl -X POST http://localhost:8000/api/start-scan
 ```
 
-### Fetch Latest Detections
-
-```bash
-curl http://localhost:8000/api/detections
+**Response:**
+```json
+{ "message": "Live scan started in the background." }
 ```
 
-## Production Deployment
+### `GET /api/scan-status`
+Returns the current scan state (polled every 2 s by the frontend).
 
-### Backend on Render
+```json
+{ "status": "running" | "completed", "message": "..." }
+```
 
-This repo includes [render.yaml](C:/Users/abhin/sportsguard.ai%20-%20Copy/render.yaml).
+### `GET /api/detections`
+Returns the latest 20 detections, ordered newest first.
+
+### `POST /api/reset-detections`
+Deletes all rows from the `detections` table.
+
+---
+
+## Running the Smoke Test
+
+The [`scripts/api_smoke_test.py`](scripts/api_smoke_test.py) script exercises the entire live pipeline end-to-end:
+
+```bash
+python scripts/api_smoke_test.py \
+  --base-url http://localhost:8000 \
+  --video test_data/videos/official_match.mp4
+```
+
+It will:
+1. Check `GET /api/health`
+2. Upload the test video via `POST /api/upload`
+3. Trigger a Reddit scan via `POST /api/start-scan`
+4. Poll `GET /api/detections` and print the results
+
+---
+
+## Deployment
+
+### Backend — Render
+
+This repo includes [`render.yaml`](render.yaml). To deploy:
 
 1. Push the repo to GitHub.
-2. Create a new Render Blueprint or Web Service.
-3. Point it at this repo.
-4. Set these required env vars in Render:
-   - `SUPABASE_URL`
-   - `SUPABASE_KEY`
-   - `GEMINI_API_KEY`
-   - `CORS_ORIGINS`
-5. Optional env vars:
-   - `REDDIT_SUBREDDIT`
-   - `HASH_DISTANCE_THRESHOLD`
+2. Create a new **Web Service** on Render and point it at the repo.
+3. Set the following environment variables in the Render dashboard:
 
-Render start command:
+| Variable | Required |
+|---|---|
+| `SUPABASE_URL` | ✅ |
+| `SUPABASE_KEY` | ✅ |
+| `GEMINI_API_KEY` | ✅ |
+| `CORS_ORIGINS` | ✅ (set to your Vercel URL) |
+| `REDDIT_SUBREDDIT` | Optional (default: `sports`) |
+| `HASH_DISTANCE_THRESHOLD` | Optional (default: `10`) |
 
+Render start command (already in `render.yaml`):
 ```bash
 uvicorn backend.main:app --host 0.0.0.0 --port $PORT
 ```
 
-### Backend on Railway
+### Backend — Railway
 
-This repo includes [railway.json](C:/Users/abhin/sportsguard.ai%20-%20Copy/railway.json).
+This repo includes [`railway.json`](railway.json). Import the repo into Railway and set the same environment variables as above.
 
-1. Create a new Railway project from the repo.
-2. Add the same backend env vars as above.
-3. Railway will run:
-
-```bash
-uvicorn backend.main:app --host 0.0.0.0 --port $PORT
-```
-
-### Frontend on Vercel
-
-The frontend lives in [frontend](C:/Users/abhin/sportsguard.ai%20-%20Copy/frontend) and includes [frontend/vercel.json](C:/Users/abhin/sportsguard.ai%20-%20Copy/frontend/vercel.json).
+### Frontend — Vercel
 
 1. Import the repo into Vercel.
-2. Set the project root to `frontend`.
-3. Set:
+2. Set the **Root Directory** to `frontend`.
+3. Add one environment variable:
 
-```env
-NEXT_PUBLIC_API_BASE_URL=https://your-backend-host.onrender.com
+```
+NEXT_PUBLIC_API_BASE_URL=https://your-backend.onrender.com
 ```
 
 4. Deploy.
 
-## API Contract
+---
 
-### `POST /api/upload`
+## Environment Variables Reference
 
-Accepts `multipart/form-data` with a single `.mp4` file.
+### Backend (`.env`)
 
-Returns:
+| Variable | Description | Default |
+|---|---|---|
+| `SUPABASE_URL` | Your Supabase project URL | — |
+| `SUPABASE_KEY` | Supabase service-role key (backend only) | — |
+| `GEMINI_API_KEY` | Google AI Studio API key | — |
+| `REDDIT_SUBREDDIT` | Subreddit to scan | `sports` |
+| `HASH_DISTANCE_THRESHOLD` | Max Hamming distance for a match (0–64) | `10` |
+| `CORS_ORIGINS` | Comma-separated allowed origins | `*` |
 
-```json
-{
-  "message": "Official asset uploaded and hashed successfully.",
-  "filename": "official_clip.mp4",
-  "hashes": ["abc123...", "def456...", "ghi789..."],
-  "record": {}
-}
-```
+### Frontend (`frontend/.env.local`)
 
-### `POST /api/start-scan`
+| Variable | Description | Default |
+|---|---|---|
+| `NEXT_PUBLIC_API_BASE_URL` | Base URL of the FastAPI backend | `http://localhost:8000` |
 
-Returns:
+---
 
-```json
-{
-  "message": "Live scan started in the background."
-}
-```
+## Design Decisions
 
-### `GET /api/detections`
+**Why pHash over exact matching?**  
+Perceptual hashing is resilient to the exact edits pirates use: re-encoding, resolution changes, brightness/contrast adjustments, and letterboxing. An exact hash would miss every one of those variants. Hamming distance of ≤10 bits (~84% similarity) catches them all.
 
-Returns the latest 20 rows from `detections`.
+**Why 3 frames per video?**  
+A start frame, a middle frame, and an end frame give good coverage of a clip without loading the full video into memory. This keeps compute and storage costs near zero.
 
-## Memory-Safety Choices
+**Why Reddit's `.json` API without a key?**  
+Reddit's public `*.json` endpoint works without authentication when a realistic browser `User-Agent` is used. This avoids rate-limit complexity and OAuth setup while still returning the data we need.
 
-- Official uploads are streamed to disk in 1 MB chunks.
-- Temp files are cleaned up after hashing.
-- Reddit scans use thumbnails or preview images only.
-- No `.mp4` Reddit media is downloaded in the scraper.
-- Matching is bounded to the latest 10 Reddit posts per scan.
-- Vision work is done on 3 frames per official upload to keep compute small.
+**Why Gemini as a second stage?**  
+Hash matching can only tell you a thumbnail *looks similar* to an official frame. It can't tell you if the Reddit post is a meme, a highlights reel, or an actual pirated stream. Gemini reads the post title and provides the legal context needed to act responsibly.
 
-## Notes
+**Why is the Supabase key backend-only?**  
+The frontend never speaks directly to Supabase — all database reads and writes go through FastAPI. This keeps the service-role key off the client and prevents direct table manipulation.
 
-- `SUPABASE_KEY` should be a backend-only key because inserts happen server-side.
-- The frontend never talks directly to Supabase.
-- Gemini has a fallback response if the model times out or returns invalid JSON.
-- Reddit JSON payloads are handled defensively with `try/except` so missing nodes do not crash the scan.
+---
 
-## Demo Runbook
-
-Use [DEMO_CHECKLIST.md](C:/Users/abhin/sportsguard.ai%20-%20Copy/DEMO_CHECKLIST.md) as the short presentation checklist before going in front of judges.
