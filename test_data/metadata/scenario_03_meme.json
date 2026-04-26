@@ -1,0 +1,7 @@
+﻿{
+  "scenario": "meme",
+  "text": "This goalkeeper reaction when conceding in the 90th minute lmao",
+  "platform": "Reddit",
+  "expected_classification": "Meme",
+  "expected_risk_max": 40
+}

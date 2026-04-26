@@ -1,0 +1,7 @@
+﻿{
+  "scenario": "piracy",
+  "text": "Watch the full match free HD stream here",
+  "platform": "Reddit",
+  "expected_classification": "Piracy",
+  "expected_risk_min": 85
+}

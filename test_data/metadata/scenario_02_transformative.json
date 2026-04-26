@@ -1,0 +1,7 @@
+﻿{
+  "scenario": "transformative",
+  "text": "Breaking down the tactical formation that won the title",
+  "platform": "Reddit",
+  "expected_classification": "Transformative",
+  "expected_risk_max": 20
+}
